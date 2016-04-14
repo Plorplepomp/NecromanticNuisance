@@ -44,6 +44,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 import actors.Castle;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 /**
  *
@@ -56,7 +57,6 @@ public class PlayScreen implements Screen
     TiledMap map;
     private TmxMapLoader mapLoader;
     private OrthogonalTiledMapRenderer renderer;
-    public SequenceAction kill;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose;
     public int gold;
@@ -65,6 +65,9 @@ public class PlayScreen implements Screen
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
     public Label goldCount;
+    public ColorAction red;
+    public MoveToAction moveOff;
+    public SequenceAction kill;
     
     
     public PlayScreen(NecromanticNuisance game)
@@ -98,17 +101,18 @@ public class PlayScreen implements Screen
         
         stage.addActor(new Necromancer(20000, skelDamage, stage));
         
-        ColorAction red = new ColorAction();
+        red = new ColorAction();
         ColorAction clear = new ColorAction();
         red.setEndColor(Color.RED);
         red.setDuration(1f);
         clear.setEndColor(Color.CLEAR);
-        MoveToAction moveOff = new MoveToAction();
+        moveOff = new MoveToAction();
         moveOff.setPosition(-100, -100);
-        SequenceAction kill = new SequenceAction(red, moveOff);
+        kill = new SequenceAction(red, moveOff);
         
         Gdx.input.setInputProcessor(stage);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
+        font.getData().setScale(0.9f, 0.9f);
         
         Skin skin = new Skin();
         TextureAtlas buttonAtlas = new TextureAtlas(Gdx.files.internal("buttons.pack"));
@@ -122,9 +126,9 @@ public class PlayScreen implements Screen
         TextButton button2 = new TextButton("  Increase Soldier Health 30g  ", textButtonStyle);
         TextButton button3 = new TextButton("  Increase Soldier Training Speed 50g  ", textButtonStyle);
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
-        button2.setPosition(290f, 0f);
-        button3.setPosition(570f, 0f);
-        button4.setPosition(0f, 600f);
+//        button2.setPosition(290f, 0f);
+//        button3.setPosition(570f, 0f);
+//        button4.setPosition(0f, 600f);
         
         button1.addListener(new ChangeListener() 
         {
@@ -181,22 +185,42 @@ public class PlayScreen implements Screen
             }
         });
         
-        stage.addActor(button1);
-        stage.addActor(button2);
-        stage.addActor(button3);
-        stage.addActor(button4);
-        
-        Label title = new Label("Stop the Necromancer!", new Label.LabelStyle(font, BLACK));
         Label goldLabel = new Label("Gold: ", new Label.LabelStyle(font, BLACK));
         Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
-        goldLabel.setPosition(60f, 700f);
-        goldCount.setPosition(80f, 700f);
+        goldCount.setName("goldCouunt");
+        
+        Table table = new Table();
+        table.add(goldLabel).width(50).right();
+        table.add(goldCount).width(50).left();
+        table.row();
+        table.add(button1).size(315f, 40f).colspan(2);
+        table.row();
+        table.add(button2).size(315f, 40f).colspan(2);
+        table.row();
+        table.add(button3).size(315f, 40f).colspan(2);
+        table.row();
+        table.add(button4).size(315f, 40f).colspan(2);
+        table.setPosition(150f, 100f);
+        stage.addActor(table);
+        table.setName("table");
+
+        
+        
+//        stage.addActor(button1);
+//        stage.addActor(button2);
+//        Stage.addActor(button3);
+//        stage.addActor(button4);
+        
+        Label title = new Label("Stop the Necromancer!", new Label.LabelStyle(font, BLACK));
+//        goldLabel.setPosition(60f, 700f);
+//        goldCount.setPosition(80f, 700f);
         title.setPosition(400f, 710f);
         
         stage.addActor(title);
-        stage.addActor(goldLabel);
-        stage.addActor(goldCount);
+//        stage.addActor(goldLabel);
+//        stage.addActor(goldCount);
         goldCount.setName("goldCount");
+        
         
 
         //windowMover = new WindowMover();
@@ -208,34 +232,6 @@ public class PlayScreen implements Screen
         
     }
     
-    public boolean keyDown(InputEvent event, int keycode)
-    {
-        switch(keycode)
-        {
-            case Input.Keys.W:
-                //System.out.println("Key W Pressed");
-                stage.getCamera().translate(0,10*Gdx.graphics.getDeltaTime(), 0);
-                stage.getCamera().update();
-                break;
-            case Input.Keys.UP:
-                stage.getCamera().translate(0,10*Gdx.graphics.getDeltaTime(), 0);
-                stage.getCamera().update();
-                break;
-            case Input.Keys.A:
-                break;
-            case Input.Keys.LEFT:
-                break;
-            case Input.Keys.S:
-                break;
-            case Input.Keys.DOWN:
-                break;
-            case Input.Keys.D:
-                break;
-            case Input.Keys.RIGHT:
-                break;            
-        }
-        return true;
-    }
     
 
     @Override
@@ -260,19 +256,14 @@ public class PlayScreen implements Screen
         if(spawnTimer < 0) 
             spawnTimer = 0;
         if(recruitTimer < 0)
-            recruitTimer = 0;
-        //String goldText = String.format("%03d", gold);
-        //goldCount.setText(goldText);
-        
+            recruitTimer = 0;       
        
                 
         if(spawnTimer == 0)
         {
             skelDamage = 160 + difficulty;
-            //System.out.println("Enemy Spawned");
             if(win==false)
                 stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 400f, stage));
-            //System.out.println("Health of first enemy: " + stage.getActors().first().getZIndex()); 
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
@@ -286,7 +277,6 @@ public class PlayScreen implements Screen
                 stage.addActor(new Castle(20000, 400, stage));
                 castleSpawned = true;
             }    
-            //System.out.println("Footman Spawned");
             if(lose==false)
             {
                 stage.addActor(new Footman(footHealth, footDamage));
@@ -300,15 +290,14 @@ public class PlayScreen implements Screen
             
             len = stageActors.size;
             Actor a = stageActors.get(i);
-            if("goldCount".equals(a.getName()))
+            
+            if("table".equals(a.getName()))
             {
-                a.remove();
-                Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
-                goldCount.setPosition(110f, 700f);
-                stage.addActor(goldCount);
-                goldCount.setName("goldCount");
+                Label goldCountUpdate = ((Table) a).findActor("goldCount");
+                goldCountUpdate.setText(String.format("%03d", gold));                
                 len = stageActors.size;
             }
+            
             if((a.getX() == 195f) && (a.getY() == 800f))
             {
                 a.remove();
@@ -324,6 +313,7 @@ public class PlayScreen implements Screen
                 //System.out.println(lives);
                 len = stageActors.size;
             }
+            
             if(("footman".equals(a.getName()))&&(a.getX()==950f)&&(a.getY()==610f))
             {
                 win = true;
@@ -332,15 +322,45 @@ public class PlayScreen implements Screen
                 stage.addActor(won);
                 len = stageActors.size;
             }
+            
             if(("skeleton".equals(a.getName()))&&(win==true))
             {
                 a.remove();
                 len = stageActors.size;
             }
+            
             for(int j = i+1; j<len; j++)
             {
                 len = stageActors.size;
                 Actor b = stageActors.get(j);
+                if((abs(a.getX()-b.getX())<50) &&
+                  (abs(a.getY()-b.getY())<50)  &&
+                  (("footman".equals(a.getName()))||("skeleton".equals(a.getName()))) &&
+                  (("footman".equals(b.getName()))||("skeleton".equals(b.getName()))) )
+                {
+                    MoveToAction stopa = new MoveToAction();
+                    stopa.setPosition(a.getX(), a.getY());
+                    MoveToAction stopb = new MoveToAction();
+                    stopb.setPosition(b.getX(), b.getY());
+                    
+                    if(("footman".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    {
+                        ((Footman) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
+                        ((BasicSkel) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((Footman) a).health <= 0)
+                        {
+                            a.setName("dead");
+                            a.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            dropSword.play(1.0f);
+                            
+                        }
+                    }
+                    
+                }
+                
+                
+                
                 if((abs(a.getX()-b.getX())<50) &&
                   (abs(a.getY()-b.getY())<50)  &&
                   (("footman".equals(a.getName()))||("skeleton".equals(a.getName()))) &&

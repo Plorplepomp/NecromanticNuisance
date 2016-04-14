@@ -23,7 +23,8 @@ public class Footman extends Actor
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17;
     Sprite sprite;
-    float health;
+    public float health;
+    public float damage;
     float velocity;
     
     public Footman(float health, float damage)
