@@ -29,7 +29,7 @@ public class BasicSkel extends Actor
     float velocity;
     //public Rectangle body;
     
-    public BasicSkel(float health, float damage, Stage stage)
+    public BasicSkel(float health, float damage, float x, float y, Stage stage)
     {
         this.setName("skeleton");
         if(damage < 220)
@@ -39,7 +39,9 @@ public class BasicSkel extends Actor
         if(damage >= 240)
             texture = new Texture("skelsword3.png");
         sprite = new Sprite(texture);
+        sprite.setScale(0.65f);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        
         this.setZIndex((int)health);
         velocity = 70;
         //Rectangle body = new Rectangle(getX(), getY(), getWidth(), getHeight());
@@ -47,51 +49,40 @@ public class BasicSkel extends Actor
         //sba.setAmount(0.25f);
         
         ms = new MoveToAction();
-        ms.setPosition(900f,610f);
+        ms.setPosition(900f,375f);
         
         ma1 = new MoveToAction();
-        ma1.setPosition(800f,610f);
-        ma1.setDuration((900-800)/velocity);
+        ma1.setPosition(680f,375f);
+        ma1.setDuration((900-680)/velocity);
         
         ma2 = new MoveToAction();
-        ma2.setPosition(800f, 400f);
-        ma2.setDuration((625-400)/velocity);
+        ma2.setPosition(680f, 575f);
+        ma2.setDuration((575-375)/velocity);
         
         ma3 = new MoveToAction();
-        ma3.setPosition(550f, 400f);
-        ma3.setDuration((800-550)/velocity);
+        ma3.setPosition(505f, 575f);
+        ma3.setDuration((680-505)/velocity);
         
         ma4 = new MoveToAction();
-        ma4.setPosition(550f, 580f);
-        ma4.setDuration((580-400)/velocity);
+        ma4.setPosition(505f, 185f);
+        ma4.setDuration((575-185)/velocity);
         
         ma5 = new MoveToAction();
-        ma5.setPosition(360f, 580f);
-        ma5.setDuration((550-360)/velocity);
+        ma5.setPosition(310f, 185f);
+        ma5.setDuration((505-310)/velocity);
         
         ma6 = new MoveToAction();
-        ma6.setPosition(360f, 200f);
-        ma6.setDuration((580-200)/velocity);
+        ma6.setPosition(310f, 375f);
+        ma6.setDuration((375-185)/velocity);
         
         ma7 = new MoveToAction();
-        ma7.setPosition(825f, 200f);
-        ma7.setDuration((825-360)/velocity);
+        ma7.setPosition(100f, 375f);
+        ma7.setDuration((310-100)/velocity);
         
-        ma8 = new MoveToAction();
-        ma8.setPosition(825f, 50f);
-        ma8.setDuration((200-50)/velocity);
-        
-        ma9 = new MoveToAction();
-        ma9.setPosition(195f, 50f);
-        ma9.setDuration((825-195)/velocity);
-        
-        ma10 = new MoveToAction();
-        ma10.setPosition(195f, 800f);
-        ma10.setDuration((800-50)/velocity);
-        
+
         SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
-        SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7, ma8, ma9);
-        SequenceAction csa = new SequenceAction(sa1, sa2, ma10);
+        SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
+        SequenceAction csa = new SequenceAction(sa1, sa2);
         BasicSkel.this.addAction(csa);
   /*      
         int len = stage.size;

@@ -62,7 +62,7 @@ public class PlayScreen implements Screen
     public int gold;
     float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
     public Sound skeletonDeath, footmanDeath, dropSword;
-    boolean soundPlayed;
+    public boolean soundPlayed, castleSpawned;
     BitmapFont font;
     public Label goldCount;
     
@@ -72,12 +72,13 @@ public class PlayScreen implements Screen
         viewport = new ScreenViewport();
         
         mapLoader = new TmxMapLoader();
-        map = mapLoader.load("map.tmx");
+        map = mapLoader.load("level1temp.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
         
-        recruitTimer = 100;
+        recruitTimer = 200;
         recruitReset = 0;
-        spawnTimer = 0;
+        spawnTimer = 100;
+        castleSpawned = false;
         difficulty = 0;
         gold = 0;
         lives = 10;
@@ -96,7 +97,6 @@ public class PlayScreen implements Screen
         stage = new Stage(viewport);
         
         stage.addActor(new Necromancer(20000, skelDamage, stage));
-        stage.addActor(new Castle(20000, 400, stage));
         
         ColorAction red = new ColorAction();
         ColorAction clear = new ColorAction();
@@ -271,21 +271,28 @@ public class PlayScreen implements Screen
             skelDamage = 160 + difficulty;
             //System.out.println("Enemy Spawned");
             if(win==false)
-                stage.addActor(new BasicSkel(skelHealth, skelDamage, stage));
+                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 400f, stage));
             //System.out.println("Health of first enemy: " + stage.getActors().first().getZIndex()); 
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
             difficulty++;
         }
+        
         if(recruitTimer == 0)
         {
+            if(!castleSpawned)
+            {
+                stage.addActor(new Castle(20000, 400, stage));
+                castleSpawned = true;
+            }    
             //System.out.println("Footman Spawned");
             if(lose==false)
+            {
                 stage.addActor(new Footman(footHealth, footDamage));
-            recruitTimer = 400 - recruitReset;
+                recruitTimer = 400 - recruitReset;
+            }
         }
-        
         Array<Actor> stageActors = stage.getActors();
         int len = stageActors.size;
         for(int i=0; i<len; i++)
@@ -479,8 +486,8 @@ public class PlayScreen implements Screen
                     }
                 }
             }
-        }        
-    }
+        }
+    }   
 
     @Override
     public void resize(int width, int height) {
