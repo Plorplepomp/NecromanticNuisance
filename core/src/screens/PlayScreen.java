@@ -310,7 +310,6 @@ public class PlayScreen implements Screen
                     stage.addActor(lost);
                     len = stageActors.size;
                 }
-                //System.out.println(lives);
                 len = stageActors.size;
             }
             
@@ -333,10 +332,7 @@ public class PlayScreen implements Screen
             {
                 len = stageActors.size;
                 Actor b = stageActors.get(j);
-                if((abs(a.getX()-b.getX())<50) &&
-                  (abs(a.getY()-b.getY())<50)  &&
-                  (("footman".equals(a.getName()))||("skeleton".equals(a.getName()))) &&
-                  (("footman".equals(b.getName()))||("skeleton".equals(b.getName()))) )
+                if((abs(a.getX()-b.getX())<50) && (abs(a.getY()-b.getY())<50))
                 {
                     MoveToAction stopa = new MoveToAction();
                     stopa.setPosition(a.getX(), a.getY());
@@ -345,6 +341,8 @@ public class PlayScreen implements Screen
                     
                     if(("footman".equals(a.getName())) && ("skeleton".equals(b.getName())))
                     {
+                        a.addAction(stopa);
+                        b.addAction(stopb);
                         ((Footman) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
                         ((BasicSkel) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
                         if(((Footman) a).health <= 0)
@@ -352,9 +350,31 @@ public class PlayScreen implements Screen
                             a.setName("dead");
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);
-                            
+                            dropSword.play(1.0f);    
                         }
+                        if(((BasicSkel) b).health <= 0)
+                        {
+                            b.setName("dead");
+                            b.addAction(kill);
+                            skeletonDeath.play(1.0f);
+                            gold += 5;
+                        }
+                    }
+                    else if (("skeleton".equals(a.getName())) && ("footman".equals(b.getName())))
+                    {
+                        a.addAction(stopa);
+                        b.addAction(stopb);
+                        ((BasicSkel) a).health -= ((Footman) b).damage * Gdx.graphics.getDeltaTime();
+                        ((Footman) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((BasicSkel) a).health <= 0)
+                        {
+                            b.setName("dead");
+                            b.addAction(kill);
+                            skeletonDeath.play(1.0f);
+                            gold += 5;
+                        }
+                        if(())
+                        
                     }
                     
                 }
