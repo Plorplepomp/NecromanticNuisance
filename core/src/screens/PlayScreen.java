@@ -68,6 +68,7 @@ public class PlayScreen implements Screen
     public ColorAction red;
     public MoveToAction moveOff;
     public SequenceAction kill;
+    public DelayAction stop;
     
     
     public PlayScreen(NecromanticNuisance game)
@@ -109,6 +110,7 @@ public class PlayScreen implements Screen
         moveOff = new MoveToAction();
         moveOff.setPosition(-100, -100);
         kill = new SequenceAction(red, moveOff);
+        stop = new DelayAction(1f);
         
         Gdx.input.setInputProcessor(stage);
         font = new BitmapFont(Gdx.files.internal("font.fnt"));
@@ -180,7 +182,7 @@ public class PlayScreen implements Screen
                 if(gold >= 50)
                 {
                     gold -= 50;
-                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage));
+                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 0, 0));
                 }
             }
         });
@@ -279,7 +281,7 @@ public class PlayScreen implements Screen
             }    
             if(lose==false)
             {
-                stage.addActor(new Footman(footHealth, footDamage));
+                stage.addActor(new Footman(footHealth, footDamage, 0, 0));
                 recruitTimer = 400 - recruitReset;
             }
         }
@@ -343,18 +345,25 @@ public class PlayScreen implements Screen
                     {
                         a.addAction(stopa);
                         b.addAction(stopb);
+//                         a.addAction(stop);
+//                        b.addAction(stop);
+//                        ((Footman) a).inCombat = true;
                         ((Footman) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
                         ((BasicSkel) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
                         if(((Footman) a).health <= 0)
                         {
                             a.setName("dead");
+                            ((Footman) a).health = 10000;
+                            a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);    
+                            dropSword.play(1.0f);  
                         }
                         if(((BasicSkel) b).health <= 0)
                         {
                             b.setName("dead");
+                            ((BasicSkel) b).health = 10000;
+                            b.clearActions();
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
@@ -364,23 +373,35 @@ public class PlayScreen implements Screen
                     {
                         a.addAction(stopa);
                         b.addAction(stopb);
+//                        a.addAction(stop);
+//                        b.addAction(stop);
                         ((BasicSkel) a).health -= ((Footman) b).damage * Gdx.graphics.getDeltaTime();
                         ((Footman) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
                         if(((BasicSkel) a).health <= 0)
                         {
-                            b.setName("dead");
-                            b.addAction(kill);
+                            a.setName("dead");
+                            ((BasicSkel) a).health = 10000;
+                            a.clearActions();
+                            a.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
                         }
-                        if(())
+                        if(((Footman) b).health <= 0)
+                        {
+                            b.setName("dead");
+                            ((Footman) b).health = 10000;
+                            b.clearActions();
+                            b.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            dropSword.play(1.0f);
+                        }
                         
                     }
                     
                 }
                 
                 
-                
+                /*
                 if((abs(a.getX()-b.getX())<50) &&
                   (abs(a.getY()-b.getY())<50)  &&
                   (("footman".equals(a.getName()))||("skeleton".equals(a.getName()))) &&
@@ -506,7 +527,7 @@ public class PlayScreen implements Screen
                         }
                         else
                             b.setZIndex((int)currentFootHealth);
-                        
+                        */
                         //a.remove();
                         /*
                         b.addAction(new DelayAction(2f));
@@ -523,8 +544,9 @@ public class PlayScreen implements Screen
                         */
                         //b.remove();
                         
-                    }
-                }
+//                    }
+                
+//                }
             }
         }
     }   

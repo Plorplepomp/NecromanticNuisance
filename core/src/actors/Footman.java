@@ -23,13 +23,15 @@ public class Footman extends Actor
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17;
     Sprite sprite;
+    public boolean inCombat;
     public float health;
     public float damage;
     float velocity;
     
-    public Footman(float health, float damage)
+    public Footman(float health, float dmg,  float x, float y)
     {
         this.setName("footman");
+        damage = dmg;
         if(damage < 400)
             texture = new Texture("footman0.png");
         if(damage < 450 && damage >= 400)
@@ -46,9 +48,7 @@ public class Footman extends Actor
         this.setZIndex((int) health);
         
        velocity = 80;
-        
-        //ScaleByAction sba = new ScaleByAction();
-        //sba.setAmount(0.25f);
+       inCombat = false;
         
         ms = new MoveToAction();
         ms.setPosition(100f,375f);
@@ -80,40 +80,31 @@ public class Footman extends Actor
         ma7 = new MoveToAction();
         ma7.setPosition(1000f, 375f);
         ma7.setDuration((1000-680)/velocity);
-        
        
+           
         
         
         SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
         SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
         SequenceAction csa1 = new SequenceAction(sa1, sa2);
-        /*
-        SequenceAction sa3 = new SequenceAction(ma10, ma11, ma12, ma13, ma14);
-        SequenceAction sa4 = new SequenceAction(ma15, ma16, ma17);
-        SequenceAction csa2 = new SequenceAction(sa3, sa4);
         
-        SequenceAction csa3 = new SequenceAction(csa1, csa2);
-        SequenceAction csa4 = new SequenceAction(csa1, csa2);
-        SequenceAction movement = new SequenceAction(sa0, csa3, csa4);
-        */
-        Footman.this.addAction(csa1);
+        if((x==0)&&(y==0))
+            this.addAction(csa1);
         
         
+            
         
-    }
-    
-        @Override
-    public void setZIndex(int health)
-    {
-        this.health = (float)health;
+        
     }
     
     @Override
-    public int getZIndex()
+    public void act(float delta)
     {
-        return (int)this.health;
+        if(!inCombat)
+            super.act(delta);
+//        inCombat = false;
     }
-    
+   
     public void draw(Batch batch, float parentAlpha)
     {
         sprite.setColor(this.getColor());

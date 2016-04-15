@@ -30,9 +30,11 @@ public class BasicSkel extends Actor
     float velocity;
     //public Rectangle body;
     
-    public BasicSkel(float health, float damage, float x, float y, Stage stage)
+    public BasicSkel(float hlth, float dmg, float x, float y, Stage stage)
     {
         this.setName("skeleton");
+        health = hlth;
+        damage = dmg;
         if(damage < 220)
             texture = new Texture("skelsword1.png");
         if(damage < 240 && damage >= 220)
