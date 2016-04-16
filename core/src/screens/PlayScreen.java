@@ -103,10 +103,8 @@ public class PlayScreen implements Screen
         stage.addActor(new Necromancer(20000, skelDamage, stage));
         
         red = new ColorAction();
-        ColorAction clear = new ColorAction();
         red.setEndColor(Color.RED);
         red.setDuration(1f);
-        clear.setEndColor(Color.CLEAR);
         moveOff = new MoveToAction();
         moveOff.setPosition(-100, -100);
         kill = new SequenceAction(red, moveOff);
@@ -123,14 +121,10 @@ public class PlayScreen implements Screen
         textButtonStyle.font = font;
         textButtonStyle.up = skin.getDrawable("unpressed");
         textButtonStyle.down = skin.getDrawable("pressed");
-        //textButtonStyle.checked = skin.getDrawable("checked-button");
         TextButton button1 = new TextButton("  Increase Soldier Damage 30g  ", textButtonStyle);
         TextButton button2 = new TextButton("  Increase Soldier Health 30g  ", textButtonStyle);
         TextButton button3 = new TextButton("  Increase Soldier Training Speed 50g  ", textButtonStyle);
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
-//        button2.setPosition(290f, 0f);
-//        button3.setPosition(570f, 0f);
-//        button4.setPosition(0f, 600f);
         
         button1.addListener(new ChangeListener() 
         {
@@ -206,32 +200,13 @@ public class PlayScreen implements Screen
         stage.addActor(table);
         table.setName("table");
 
-        
-        
-//        stage.addActor(button1);
-//        stage.addActor(button2);
-//        Stage.addActor(button3);
-//        stage.addActor(button4);
-        
+    
         Label title = new Label("Stop the Necromancer!", new Label.LabelStyle(font, BLACK));
-//        goldLabel.setPosition(60f, 700f);
-//        goldCount.setPosition(80f, 700f);
         title.setPosition(400f, 710f);
         
         stage.addActor(title);
-//        stage.addActor(goldLabel);
-//        stage.addActor(goldCount);
         goldCount.setName("goldCount");
-        
-        
-
-        //windowMover = new WindowMover();
-        //Gdx.input.setInputProcessor(this);
-        //Gdx.input.setInputProcessor();
-        //stage.addActor(new TestActor(new Texture(Gdx.files.internal("badlogic.jpg"))));
-        //stage.setKeyboardFocus(null);
-        
-        
+           
     }
     
     
@@ -253,14 +228,21 @@ public class PlayScreen implements Screen
     
     public void update(float delta)
     {
+        red = new ColorAction();
+        red.setEndColor(Color.RED);
+        red.setDuration(1f);
+        moveOff = new MoveToAction();
+        moveOff.setPosition(-100, -100);
+        kill = new SequenceAction(red, moveOff);
+        
+        
         recruitTimer -= 1*delta;;
         spawnTimer -= 1*delta;
         if(spawnTimer < 0) 
             spawnTimer = 0;
         if(recruitTimer < 0)
             recruitTimer = 0;       
-       
-                
+              
         if(spawnTimer == 0)
         {
             skelDamage = 160 + difficulty;
@@ -334,7 +316,7 @@ public class PlayScreen implements Screen
             {
                 len = stageActors.size;
                 Actor b = stageActors.get(j);
-                if((abs(a.getX()-b.getX())<50) && (abs(a.getY()-b.getY())<50))
+                if((abs(a.getX()-b.getX())<30) && (abs(a.getY()-b.getY())<30))
                 {
                     MoveToAction stopa = new MoveToAction();
                     stopa.setPosition(a.getX(), a.getY());
@@ -367,6 +349,9 @@ public class PlayScreen implements Screen
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
+                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY()));
+                            ((Footman) a).remove();
+
                         }
                     }
                     else if (("skeleton".equals(a.getName())) && ("footman".equals(b.getName())))
@@ -385,6 +370,8 @@ public class PlayScreen implements Screen
                             a.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
+                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY()));
+                            ((Footman) b).remove();
                         }
                         if(((Footman) b).health <= 0)
                         {
