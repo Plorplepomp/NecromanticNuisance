@@ -21,17 +21,18 @@ public class Footman extends Actor
 {
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
-    MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17;
+    MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17, init;
     Sprite sprite;
     public boolean inCombat;
     public float health;
     public float damage;
     float velocity;
     
-    public Footman(float health, float dmg,  float x, float y)
+    public Footman(float hlth, float dmg,  float x, float y)
     {
         this.setName("footman");
         damage = dmg;
+        health = hlth;
         if(damage < 400)
             texture = new Texture("footman0.png");
         if(damage < 450 && damage >= 400)
@@ -49,6 +50,10 @@ public class Footman extends Actor
         
        velocity = 80;
        inCombat = false;
+       
+        init = new MoveToAction();
+        init.setPosition(x, y);
+               
         
         ms = new MoveToAction();
         ms.setPosition(100f,375f);
@@ -83,13 +88,35 @@ public class Footman extends Actor
        
            
         
-        
         SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
         SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
+        SequenceAction sa3 = new SequenceAction(ma1, ma2, ma3, ma4);
+        SequenceAction sa4 = new SequenceAction(ma2, ma3, ma4);
+        SequenceAction sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
+        SequenceAction sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
+        SequenceAction sa7 = new SequenceAction(init, ma5, ma6, ma7);
+        SequenceAction sa8 = new SequenceAction(init, ma6, ma7);
         SequenceAction csa1 = new SequenceAction(sa1, sa2);
+        SequenceAction csa2 = new SequenceAction(init, sa3, sa2);
+        SequenceAction csa3 = new SequenceAction(init, sa4, sa2);
+        SequenceAction csa4 = new SequenceAction(init, sa5);
         
         if((x==0)&&(y==0))
             this.addAction(csa1);
+        else if((y==375)&&(x<315))
+            this.addAction(csa2);
+        else if((x==315)&&(y!=180))
+            this.addAction(csa3);
+        else if((y==180)&&(x!=510))
+            this.addAction(csa4);
+        else if((x==510)&&(y!=570))
+            this.addAction(sa6);
+        else if((y==570)&&(x!=680))
+            this.addAction(sa7);
+        else if((x==680)&&(y!=375))
+            this.addAction(sa8);
+        else if((y==375)&&(x>315))
+            this.addAction(ma7);
         
         
             
