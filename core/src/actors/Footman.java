@@ -60,7 +60,7 @@ public class Footman extends Actor
         
         ma1 = new MoveToAction();
         ma1.setPosition(315f,375f);
-        ma1.setDuration(((315-100)/velocity));
+        ma1.setDuration(((315-100 )/velocity));
         
         ma2 = new MoveToAction();
         ma2.setPosition(315f, 180f);
@@ -101,10 +101,14 @@ public class Footman extends Actor
         SequenceAction csa3 = new SequenceAction(init, sa4, sa2);
         SequenceAction csa4 = new SequenceAction(init, sa5);
         
-        if((x==0)&&(y==0))
+        if((x==100)&&(y==375))
             this.addAction(csa1);
         else if((y==375)&&(x<315))
+        {
+            ma1.setDuration((this.getX()-100)/velocity);
+            
             this.addAction(csa2);
+        }
         else if((x==315)&&(y!=180))
             this.addAction(csa3);
         else if((y==180)&&(x!=510))

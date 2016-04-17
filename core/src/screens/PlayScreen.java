@@ -263,7 +263,7 @@ public class PlayScreen implements Screen
             }    
             if(lose==false)
             {
-                stage.addActor(new Footman(footHealth, footDamage, 0, 0));
+                stage.addActor(new Footman(footHealth, footDamage, 100f, 375f));
                 recruitTimer = 400 - recruitReset;
             }
         }
