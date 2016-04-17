@@ -316,7 +316,7 @@ public class PlayScreen implements Screen
             {
                 len = stageActors.size;
                 Actor b = stageActors.get(j);
-                if((abs(a.getX()-b.getX())<30) && (abs(a.getY()-b.getY())<30))
+                if((abs(a.getX()-b.getX())<30) && (abs(a.getY()-b.getY())<30)&&(a.getX()!=0))
                 {
                     MoveToAction stopa = new MoveToAction();
                     stopa.setPosition(a.getX(), a.getY());

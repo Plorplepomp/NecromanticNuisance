@@ -105,23 +105,48 @@ public class Footman extends Actor
             this.addAction(csa1);
         else if((y==375)&&(x<315))
         {
-            ma1.setDuration((this.getX()-100)/velocity);
-            
+            ma1.setDuration((315-x)/velocity);
+            sa3 = new SequenceAction(ma1, ma2, ma3, ma4);
+            csa2 = new SequenceAction(init, sa3, sa2);
             this.addAction(csa2);
         }
         else if((x==315)&&(y!=180))
+        {
+            ma2.setDuration((y-180)/velocity);
+            sa4 = new SequenceAction(ma2, ma3, ma4);
+            csa3 = new SequenceAction(init, sa4, sa2);
             this.addAction(csa3);
+        }
         else if((y==180)&&(x!=510))
+        {
+            ma3.setDuration((510-x)/velocity);
+            sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
+            csa4 = new SequenceAction(init, sa5);
             this.addAction(csa4);
+        }
         else if((x==510)&&(y!=570))
+        {
+            ma4.setDuration((570-y)/velocity);
+            sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
             this.addAction(sa6);
+        }
         else if((y==570)&&(x!=680))
+        {
+            ma5.setDuration((680-x)/velocity);
+            sa7 = new SequenceAction(init, ma5, ma6, ma7);
             this.addAction(sa7);
+        }
         else if((x==680)&&(y!=375))
+        {    
+            ma6.setDuration((y-375)/velocity);
+            sa8 = new SequenceAction(init, ma6, ma7);
             this.addAction(sa8);
+        }
         else if((y==375)&&(x>315))
+        {
+            ma7.setDuration((1000-x)/velocity);
             this.addAction(ma7);
-        
+        }
         
             
         
