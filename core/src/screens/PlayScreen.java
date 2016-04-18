@@ -5,6 +5,7 @@
  */
 package screens;
 
+import actors.Archer;
 import actors.BasicSkel;
 import actors.Footman;
 import actors.Necromancer;
@@ -61,6 +62,7 @@ public class PlayScreen implements Screen
     boolean win, lose;
     public int gold;
     float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
+    float archerHealth, archerDamage;
     public Sound skeletonDeath, footmanDeath, dropSword;
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
@@ -91,6 +93,8 @@ public class PlayScreen implements Screen
         
         footHealth = 1000;
         footDamage = 300;
+        archerHealth = 500;
+        archerDamage = 300;
         skelHealth = 1000;
         skelDamage = 160+difficulty;
         
@@ -125,6 +129,7 @@ public class PlayScreen implements Screen
         TextButton button2 = new TextButton("  Increase Soldier Health 30g  ", textButtonStyle);
         TextButton button3 = new TextButton("  Increase Soldier Training Speed 50g  ", textButtonStyle);
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
+        TextButton button5 = new TextButton("  Train Archer 10g ", textButtonStyle);
         
         button1.addListener(new ChangeListener() 
         {
@@ -176,7 +181,20 @@ public class PlayScreen implements Screen
                 if(gold >= 50)
                 {
                     gold -= 50;
-                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 0, 0));
+                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 375));
+                }
+            }
+        });        
+        
+        button5.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) 
+            {
+                if(gold >= 10)
+                {
+                    gold -= 10;
+                    stage.addActor(new Archer(archerHealth, archerDamage, 100f, 375f, stage));
                 }
             }
         });
@@ -190,13 +208,14 @@ public class PlayScreen implements Screen
         table.add(goldCount).width(50).left();
         table.row();
         table.add(button1).size(315f, 40f).colspan(2);
+        table.add(button5).size(315f, 40f).colspan(2);
         table.row();
         table.add(button2).size(315f, 40f).colspan(2);
         table.row();
         table.add(button3).size(315f, 40f).colspan(2);
         table.row();
         table.add(button4).size(315f, 40f).colspan(2);
-        table.setPosition(150f, 100f);
+        table.setPosition(310f, 100f);
         stage.addActor(table);
         table.setName("table");
 
@@ -247,7 +266,7 @@ public class PlayScreen implements Screen
         {
             skelDamage = 160 + difficulty;
             if(win==false)
-                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 400f, stage));
+                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 375f, stage));
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
@@ -339,7 +358,9 @@ public class PlayScreen implements Screen
                             a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);  
+                            dropSword.play(1.0f);
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            ((BasicSkel) b).remove();
                         }
                         if(((BasicSkel) b).health <= 0)
                         {
@@ -381,6 +402,8 @@ public class PlayScreen implements Screen
                             b.addAction(kill);
                             footmanDeath.play(1.0f);
                             dropSword.play(1.0f);
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            ((BasicSkel) a).remove();
                         }
                         
                     }

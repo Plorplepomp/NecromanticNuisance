@@ -23,7 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class BasicSkel extends Actor
 {
     Texture texture;
-    MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
+    MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10, init;
     public Sprite sprite;
     public float health;
     public float damage;
@@ -50,6 +50,9 @@ public class BasicSkel extends Actor
         //Rectangle body = new Rectangle(getX(), getY(), getWidth(), getHeight());
         //ScaleByAction sba = new ScaleByAction();
         //sba.setAmount(0.25f);
+        
+        init = new MoveToAction();
+        init.setPosition(x, y);
         
         ms = new MoveToAction();
         ms.setPosition(900f,375f);
@@ -85,9 +88,57 @@ public class BasicSkel extends Actor
 
         SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
         SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
+        SequenceAction sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
         SequenceAction csa = new SequenceAction(sa1, sa2);
-        BasicSkel.this.addAction(csa);
-  /*      
+        
+        if((x==900)&&(y==375))
+            this.addAction(csa);
+        else if((y==375)&&(x>680))
+        {
+            ma1.setDuration((x-680)/velocity);
+            sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+            SequenceAction csa1 = new SequenceAction(sa3, sa2);
+            this.addAction(csa1);
+        }
+        else if((x==680)&&(y!=575))
+        {
+            ma2.setDuration((575-y)/velocity);
+            SequenceAction sa4 = new SequenceAction(init, ma2, ma3, ma4);
+            SequenceAction csa4 = new SequenceAction(sa4, sa2);
+            this.addAction(csa4);
+        }
+        else if((y==575)&&(x!=505))
+        {
+            ma3.setDuration((x-505)/velocity);
+            SequenceAction sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
+            SequenceAction csa5 = new SequenceAction(init, sa5);
+            this.addAction(csa5);
+        }
+        else if((x==505)&&(y!=185))
+        {
+            ma4.setDuration((y-185)/velocity);
+            SequenceAction sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
+            this.addAction(sa6);
+        }
+        else if((y==185)&&(x!=310))
+        {
+            ma5.setDuration((x-310)/velocity);
+            SequenceAction sa7 = new SequenceAction(init, ma5, ma6, ma7);
+            this.addAction(sa7);
+        }
+        else if((x==310)&&(y!=375))
+        {    
+            ma6.setDuration((375-y)/velocity);
+            SequenceAction sa8 = new SequenceAction(init, ma6, ma7);
+            this.addAction(sa8);
+        }
+        else if((y==375)&&(x<600))
+        {
+            ma7.setDuration((1000-x)/velocity);
+            this.addAction(ma7);
+        }
+        
+        /*      
         int len = stage.size;
         for(i=0; i<len; i++){
         Actor a = stageActors.get(i);
