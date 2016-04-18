@@ -407,7 +407,18 @@ public class PlayScreen implements Screen
                         }
                         
                     }
-                    
+               
+                        
+                }
+                if((abs(a.getX()-b.getX())<100) && (abs(a.getY()-b.getY())<100)&&(a.getX()!=0))
+                {
+                    MoveToAction stopa = new MoveToAction();
+                    stopa.setPosition(a.getX(), a.getY());
+                    if (("archer".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    {
+                        a.addAction(stopa);
+                        stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                    }
                 }
                 
                 

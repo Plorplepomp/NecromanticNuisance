@@ -146,7 +146,7 @@ public class Archer extends Actor
     @Override
     public void act(float delta)
     {
-        arrowTimer -= Gdx.graphics.getDeltaTime();
+        /*arrowTimer -= delta;
         if(arrowTimer <= 0)
         {
             Array<Actor> stageActors = stage.getActors();
@@ -154,12 +154,19 @@ public class Archer extends Actor
             {
                 len = stageActors.size;
                 Actor a = stageActors.get(i);
-                if((abs(this.getX()-a.getX())<100) && (abs(this.getY()-a.getY())<30)&&(a.getX()!=0))
+                if((abs(this.getX()-a.getX())<100) && (abs(this.getY()-a.getY())<100)&&(a.getX()!=0))
                 {
-                    if(("skeleton".equals(a.getName())
+                    if(("skeleton".equals(a.getName())))
+                    {
+                        MoveToAction stop = new MoveToAction();
+                        stop.setPosition(this.getX(), this.getY());
+                        this.clearActions();
+                        this.addAction(stop);
+                    }
                 }
-            }    
-        }
+            }
+            arrowTimer = 1;
+        }*/
         super.act(delta);
     }
    
