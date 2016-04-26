@@ -135,7 +135,8 @@ public class BasicSkel extends Actor
         else if((y==375)&&(x<600))
         {
             ma7.setDuration((1000-x)/velocity);
-            this.addAction(ma7);
+            SequenceAction sa9 = new SequenceAction(init, ma7);
+            this.addAction(sa9);
         }
         
         /*      

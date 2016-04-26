@@ -22,14 +22,13 @@ import static java.lang.Math.abs;
  */
 public class Archer extends Actor
 {
-    public float health, damage;
+    public float health, damage, arrowTimer;
     Sprite sprite;
     float velocity;
     Texture texture;
     MoveToAction init, ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7;
     public Stage stage;
     int len;
-    float arrowTimer;
     
     public Archer(float hlth, float dmg, float x, float y, Stage stg)
     {
@@ -146,6 +145,7 @@ public class Archer extends Actor
     @Override
     public void act(float delta)
     {
+        arrowTimer -= delta;
         /*arrowTimer -= delta;
         if(arrowTimer <= 0)
         {

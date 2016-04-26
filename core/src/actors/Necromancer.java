@@ -22,12 +22,12 @@ public class Necromancer extends Actor
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     public Sprite sprite;
-    float health;
+    public float health, damage;
     float velocity;
     
     public Necromancer(float health, float damage, Stage stage)
     {
-        this.setName("skeleton");
+        this.setName("Necromancer");
         texture = new Texture("necromancer.png");
         sprite = new Sprite(texture);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
@@ -38,7 +38,7 @@ public class Necromancer extends Actor
         //sba.setAmount(0.25f);
         
         ms = new MoveToAction();
-        ms.setPosition(950f,610f);
+        ms.setPosition(940f,375f);
         
         ma1 = new MoveToAction();
         ma1.setPosition(800f,625f);

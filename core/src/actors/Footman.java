@@ -145,7 +145,8 @@ public class Footman extends Actor
         else if((y==375)&&(x>315))
         {
             ma7.setDuration((1000-x)/velocity);
-            this.addAction(ma7);
+            SequenceAction sa9 = new SequenceAction(init, ma7);
+            this.addAction(sa9);
         }
         
             

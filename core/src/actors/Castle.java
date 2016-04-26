@@ -39,7 +39,7 @@ public class Castle extends Actor
         //sba.setAmount(0.25f);
         
         ms = new MoveToAction();
-        ms.setPosition(50f,400f);
+        ms.setPosition(35f,370f);
         
         Castle.this.addAction(ms);
   /*      

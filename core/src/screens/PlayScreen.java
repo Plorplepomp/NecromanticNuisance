@@ -6,6 +6,7 @@
 package screens;
 
 import actors.Archer;
+import actors.Arrow;
 import actors.BasicSkel;
 import actors.Footman;
 import actors.Necromancer;
@@ -60,7 +61,7 @@ public class PlayScreen implements Screen
     private OrthogonalTiledMapRenderer renderer;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose;
-    public int gold;
+    public int gold, archerRange;
     float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
     float archerHealth, archerDamage;
     public Sound skeletonDeath, footmanDeath, dropSword;
@@ -95,6 +96,7 @@ public class PlayScreen implements Screen
         footDamage = 300;
         archerHealth = 500;
         archerDamage = 300;
+        archerRange = 100;
         skelHealth = 1000;
         skelDamage = 160+difficulty;
         
@@ -130,6 +132,7 @@ public class PlayScreen implements Screen
         TextButton button3 = new TextButton("  Increase Soldier Training Speed 50g  ", textButtonStyle);
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
         TextButton button5 = new TextButton("  Train Archer 10g ", textButtonStyle);
+        TextButton button6 = new TextButton("  Increase Archer Range 30g  ", textButtonStyle);
         
         button1.addListener(new ChangeListener() 
         {
@@ -199,6 +202,20 @@ public class PlayScreen implements Screen
             }
         });
         
+        button6.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                if(gold >= 30)
+                {
+                    gold -= 30;
+                    archerRange += 20;
+                }
+            }
+        });
+        
+        
         Label goldLabel = new Label("Gold: ", new Label.LabelStyle(font, BLACK));
         Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
         goldCount.setName("goldCouunt");
@@ -211,6 +228,7 @@ public class PlayScreen implements Screen
         table.add(button5).size(315f, 40f).colspan(2);
         table.row();
         table.add(button2).size(315f, 40f).colspan(2);
+        table.add(button6).size(315f, 40f).colspan(2);
         table.row();
         table.add(button3).size(315f, 40f).colspan(2);
         table.row();
@@ -410,14 +428,48 @@ public class PlayScreen implements Screen
                
                         
                 }
-                if((abs(a.getX()-b.getX())<100) && (abs(a.getY()-b.getY())<100)&&(a.getX()!=0))
+                if((abs(a.getX()-b.getX())<archerRange) && (abs(a.getY()-b.getY())<archerRange)&&(a.getX()!=0))
                 {
                     MoveToAction stopa = new MoveToAction();
                     stopa.setPosition(a.getX(), a.getY());
+                    MoveToAction stopb = new MoveToAction();
+                    stopb.setPosition(b.getX(), b.getY());
+                    
                     if (("archer".equals(a.getName())) && ("skeleton".equals(b.getName())))
                     {
+                        a.clearActions();
                         a.addAction(stopa);
-                        stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                        if(((Archer) a).arrowTimer <= 0)
+                        {
+                            stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            ((Archer) a).arrowTimer = 3;
+                            ((BasicSkel) b).health -= archerDamage;
+                            if(((BasicSkel) b).health <= 0)
+                                b.addAction(kill);
+                        }
+                        
+                    }
+                    if (("archer".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    {
+                        b.clearActions();
+                        b.addAction(stopb);
+                        if(((Archer) b).arrowTimer <= 0)
+                        {
+                            ((Archer) b).arrowTimer = 3;
+                            stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            ((BasicSkel) a).health -= archerDamage;
+                            if(((BasicSkel) a).health <= 0)
+                            {
+                                a.setName("dead");
+                                ((BasicSkel) a).health = 10000;
+                                a.clearActions();
+                                b.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                                stage.addActor(new Archer(((Archer) b).health, ((Archer) b).damage, ((Archer) b).getX(), ((Archer) b).getY(), stage));
+                                ((Archer) b).remove();
+                            }
+                        }
                     }
                 }
                 
