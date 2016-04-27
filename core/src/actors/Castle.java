@@ -23,46 +23,29 @@ public class Castle extends Actor
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     public Sprite sprite;
-    float health;
+    public float health;
     float velocity;
     
-    public Castle(float health, float damage, Stage stage)
+    public Castle(float hlth, float damage, Stage stage)
     {
-        this.setName("footman");
+        this.setName("castle");
         texture = new Texture("castle.png");
+        health = hlth;
+        
         sprite = new Sprite(texture);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        this.setZIndex((int)health);
         velocity = 70;
-        //Rectangle body = new Rectangle(getX(), getY(), getWidth(), getHeight());
-        //ScaleByAction sba = new ScaleByAction();
-        //sba.setAmount(0.25f);
-        
+
         ms = new MoveToAction();
         ms.setPosition(35f,370f);
         
         Castle.this.addAction(ms);
-  /*      
-        int len = stage.size;
-        for(i=0; i<len; i++){
-        Actor a = stageActors.get(i);
-        if(a.getName().equals("myactor")){
-        //a is your Actor!
-        break;
-    */
+
     }
 
-    @Override
-    public void setZIndex(int health)
-    {
-        this.health = (float)health;
-    }
+
     
-    @Override
-    public int getZIndex()
-    {
-        return (int)this.health;
-    }
+
 
  /*   @Override
     public void act(float delta)
@@ -83,15 +66,6 @@ public class Castle extends Actor
     protected void positionChanged()
     {
       sprite.setPosition(getX(), getY());
-      /*
-      body.x = getX();
-      body.y = getY();
-      body.height = getHeight();
-      body.width = getWidth();
-      super.positionChanged();
-      
-    //  Array<Actor> stageActors = stage.getActors();
-      */
     }
     
 }

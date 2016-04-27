@@ -63,7 +63,7 @@ public class PlayScreen implements Screen
     boolean win, lose;
     public int gold, archerRange;
     float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
-    float archerHealth, archerDamage;
+    float archerHealth, archerDamage, archerMoveTimer;
     public Sound skeletonDeath, footmanDeath, dropSword;
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
@@ -82,9 +82,10 @@ public class PlayScreen implements Screen
         map = mapLoader.load("level1temp.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
         
-        recruitTimer = 200;
+        recruitTimer = 15;
         recruitReset = 0;
         spawnTimer = 100;
+        archerMoveTimer = 10;
         castleSpawned = false;
         difficulty = 0;
         gold = 0;
@@ -97,12 +98,13 @@ public class PlayScreen implements Screen
         archerHealth = 500;
         archerDamage = 300;
         archerRange = 100;
-        skelHealth = 1000;
+        skelHealth = 1100;
         skelDamage = 160+difficulty;
         
         skeletonDeath = Gdx.audio.newSound(Gdx.files.internal("skeletondeath.wav"));
         footmanDeath = Gdx.audio.newSound(Gdx.files.internal("footmanDeath.wav"));
         dropSword = Gdx.audio.newSound(Gdx.files.internal("dropSword.wav"));
+        
         
         stage = new Stage(viewport);
         
@@ -197,7 +199,7 @@ public class PlayScreen implements Screen
                 if(gold >= 10)
                 {
                     gold -= 10;
-                    stage.addActor(new Archer(archerHealth, archerDamage, 100f, 375f, stage));
+                    stage.addActor(new Archer(archerHealth, archerDamage, 100f, 375f, 3f, stage));
                 }
             }
         });
@@ -288,7 +290,7 @@ public class PlayScreen implements Screen
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
-            difficulty++;
+            difficulty += 1;
         }
         
         if(recruitTimer == 0)
@@ -304,6 +306,7 @@ public class PlayScreen implements Screen
                 recruitTimer = 400 - recruitReset;
             }
         }
+        
         Array<Actor> stageActors = stage.getActors();
         int len = stageActors.size;
         for(int i=0; i<len; i++)
@@ -360,13 +363,15 @@ public class PlayScreen implements Screen
                     MoveToAction stopb = new MoveToAction();
                     stopb.setPosition(b.getX(), b.getY());
                     
+                    
+                    //
+                    // Footman Skeleton Collision
+                    //
+                    
                     if(("footman".equals(a.getName())) && ("skeleton".equals(b.getName())))
                     {
                         a.addAction(stopa);
                         b.addAction(stopb);
-//                         a.addAction(stop);
-//                        b.addAction(stop);
-//                        ((Footman) a).inCombat = true;
                         ((Footman) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
                         ((BasicSkel) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
                         if(((Footman) a).health <= 0)
@@ -425,9 +430,149 @@ public class PlayScreen implements Screen
                         }
                         
                     }
-               
+                    
+                    //
+                    //Skeleton Archer Collision
+                    //
+                    
+                    if(("archer".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    {
+                        a.addAction(stopa);
+                        ((Archer) a).notmoving = true;
+                        b.addAction(stopb);
+                        ((Archer) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
+                        if(((Archer) a).health <= 0)
+                        {
+                            ((Archer) a).notmoving = false;
+                            a.setName("dead");
+                            ((Archer) a).health = 10000;
+                            a.clearActions();
+                            a.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            ((BasicSkel) b).remove();
+                        }
+                    }
+                    else if(("archer".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    {
+                        b.addAction(stopb);
+                        ((Archer) b).notmoving = true;
+                        a.addAction(stopa);
+                        ((Archer) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((Archer) b).health <= 0)
+                        {
+                            ((Archer) b).notmoving = false;
+                            b.setName("dead");
+                            ((Archer) b).health = 10000;
+                            b.clearActions();
+                            b.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            ((BasicSkel) a).remove();
+                        }
+                    }
+                    
+                    //
+                    //Footman necromancer coliision
+                    //
+                    
+                    if(("footman".equals(a.getName())) && ("Necromancer".equals(b.getName())))
+                    {
+                        a.addAction(stopa);
+                        ((Footman) a).health -= ((Necromancer) b).damage * Gdx.graphics.getDeltaTime();
+                        ((Necromancer) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((Footman) a).health <= 0)
+                        {
+                            a.setName("dead");
+                            ((Footman) a).health = 10000;
+                            a.clearActions();
+                            a.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            dropSword.play(1.0f);
+                        }
+                        if(((Necromancer) b).health <= 0)
+                        {
+                            b.setName("dead");
+                            ((Necromancer) b).health = 10000;
+                            b.clearActions();
+                            b.addAction(kill);
+                            skeletonDeath.play(1.0f);
+                            gold += 50;
+                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY()));
+                            ((Footman) a).remove();
+                            win = true;
+                        }
+                    }
+                    else if (("necromancer".equals(a.getName())) && ("footman".equals(b.getName())))
+                    {
+                        b.addAction(stopb);
+                        ((Necromancer) a).health -= ((Footman) b).damage * Gdx.graphics.getDeltaTime();
+                        ((Footman) b).health -= ((Necromancer) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((Necromancer) a).health <= 0)
+                        {
+                            a.setName("dead");
+                            ((Necromancer) a).health = 10000;
+                            a.clearActions();
+                            a.addAction(kill);
+                            skeletonDeath.play(1.0f);
+                            gold += 50;
+                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY()));
+                            ((Footman) b).remove();
+                            win = true;
+                        }
+                        if(((Footman) b).health <= 0)
+                        {
+                            b.setName("dead");
+                            ((Footman) b).health = 10000;
+                            b.clearActions();
+                            b.addAction(kill);
+                            footmanDeath.play(1.0f);
+                            dropSword.play(1.0f);
+                        }
                         
+                    }
+                    
+                    //
+                    //Skeleton Castle Collision
+                    //
+                    
+                    if(("Skeleton".equals(a.getName())) && ("Castle".equals(b.getName())))
+                    {
+                        a.addAction(stopa);
+                        ((Castle) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
+                        if(((Castle) b).health <= 0)
+                        {
+                            b.setName("dead");
+                            ((Castle) b).health = 10000;
+                            b.clearActions();
+                            b.addAction(kill);
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            ((BasicSkel) a).remove();
+                            lose = true;
+                        }
+                    }
+                    else if (("Castle".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    {
+                        b.addAction(stopb);
+                        ((Castle) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
+                        if(((Castle) a).health <= 0)
+                        {
+                            a.setName("dead");
+                            ((Castle) a).health = 10000;
+                            a.clearActions();
+                            a.addAction(kill);
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            ((BasicSkel) b).remove();
+                            lose = true;
+                        }
+                        
+                    }
                 }
+                
+                //
+                // Archer combat
+                //
+                
                 if((abs(a.getX()-b.getX())<archerRange) && (abs(a.getY()-b.getY())<archerRange)&&(a.getX()!=0))
                 {
                     MoveToAction stopa = new MoveToAction();
@@ -435,17 +580,29 @@ public class PlayScreen implements Screen
                     MoveToAction stopb = new MoveToAction();
                     stopb.setPosition(b.getX(), b.getY());
                     
+                    //
+                    // Archer skeleton combat
+                    //
+                    
                     if (("archer".equals(a.getName())) && ("skeleton".equals(b.getName())))
                     {
                         a.clearActions();
                         a.addAction(stopa);
+                        ((Archer) a).notmoving = true;
                         if(((Archer) a).arrowTimer <= 0)
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
                             ((Archer) a).arrowTimer = 3;
                             ((BasicSkel) b).health -= archerDamage;
                             if(((BasicSkel) b).health <= 0)
+                            {
+                                b.setName("dead");
+                                ((BasicSkel) b).health = 10000;
+                                b.clearActions();
                                 b.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                            }
                         }
                         
                     }
@@ -453,6 +610,7 @@ public class PlayScreen implements Screen
                     {
                         b.clearActions();
                         b.addAction(stopb);
+                        ((Archer) b).notmoving = true;
                         if(((Archer) b).arrowTimer <= 0)
                         {
                             ((Archer) b).arrowTimer = 3;
@@ -463,14 +621,75 @@ public class PlayScreen implements Screen
                                 a.setName("dead");
                                 ((BasicSkel) a).health = 10000;
                                 a.clearActions();
-                                b.addAction(kill);
+                                a.addAction(kill);
                                 skeletonDeath.play(1.0f);
                                 gold += 5;
-                                stage.addActor(new Archer(((Archer) b).health, ((Archer) b).damage, ((Archer) b).getX(), ((Archer) b).getY(), stage));
-                                ((Archer) b).remove();
                             }
                         }
                     }
+                    
+                    //
+                    //Archer Necromancer combat
+                    //
+                    
+                    if (("archer".equals(a.getName())) && ("necromancer".equals(b.getName())))
+                    {
+                        a.clearActions();
+                        a.addAction(stopa);
+                        ((Archer) a).notmoving = true;
+                        if(((Archer) a).arrowTimer <= 0)
+                        {
+                            stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            ((Archer) a).arrowTimer = 3;
+                            ((Necromancer) b).health -= archerDamage;
+                            if(((Necromancer) b).health <= 0)
+                            {
+                                b.setName("dead");
+                                ((Necromancer) b).health = 10000;
+                                b.clearActions();
+                                b.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 50;
+                            }
+                        }
+                        
+                    }
+                    if (("archer".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    {
+                        b.clearActions();
+                        b.addAction(stopb);
+                        ((Archer) b).notmoving = true;
+                        if(((Archer) b).arrowTimer <= 0)
+                        {
+                            ((Archer) b).arrowTimer = 3;
+                            stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            ((Necromancer) a).health -= archerDamage;
+                            if(((Necromancer) a).health <= 0)
+                            {
+                                a.setName("dead");
+                                ((Necromancer) a).health = 10000;
+                                a.clearActions();
+                                a.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 50;
+                            }
+                        }
+                    }
+                
+                
+                
+                }
+                
+                
+                
+                archerMoveTimer -= Gdx.graphics.getDeltaTime();
+                if("archer".equals(a.getName()) && ((Archer) a).notmoving && (archerMoveTimer <= 0))
+                {
+                    System.out.println("Archer not moving, new archer spawned");
+                    stage.addActor(new Archer(((Archer) a).health, ((Archer) a).damage, ((Archer) a).getX(), ((Archer) a).getY(), ((Archer)a).arrowTimer, stage));
+                    ((Archer) a).remove();
+                    len = stageActors.size;
+                    archerMoveTimer = 50;
                 }
                 
                 
@@ -641,7 +860,9 @@ public class PlayScreen implements Screen
     }
 
     @Override
-    public void dispose() {
+    public void dispose() 
+    {
+        stage.dispose();
     }
     
 }

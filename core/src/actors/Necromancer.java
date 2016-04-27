@@ -27,7 +27,7 @@ public class Necromancer extends Actor
     
     public Necromancer(float health, float damage, Stage stage)
     {
-        this.setName("Necromancer");
+        this.setName("necromancer");
         texture = new Texture("necromancer.png");
         sprite = new Sprite(texture);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());

@@ -26,16 +26,18 @@ public class Archer extends Actor
     Sprite sprite;
     float velocity;
     Texture texture;
+    public boolean notmoving;
     MoveToAction init, ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7;
     public Stage stage;
     int len;
     
-    public Archer(float hlth, float dmg, float x, float y, Stage stg)
+    public Archer(float hlth, float dmg, float x, float y, float arrowTmr, Stage stg)
     {
+        notmoving = false;
         health = hlth;
         damage = dmg;
         stage = stg;
-        arrowTimer = 3;
+        arrowTimer = arrowTmr;
         this.setName("archer");
         texture = new Texture("archer.png");
         sprite = new Sprite(texture);
@@ -137,7 +139,8 @@ public class Archer extends Actor
         else if((y==375)&&(x>315))
         {
             ma7.setDuration((1000-x)/velocity);
-            this.addAction(ma7);
+            SequenceAction sa9 = new SequenceAction(init, ma7);
+            this.addAction(sa9);
         }
         
     }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import java.lang.Math;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.asin;
+import static java.lang.Math.atan;
 
 /**
  *
@@ -33,8 +34,11 @@ public class Arrow extends Actor
         texture = new Texture("arrow.png");
         sprite = new Sprite(texture);
         sprite.setScale(0.1f);
-        angle = (float) asin((destY-startY)/(destX-startX));
-//        sprite.setRotation(angle);
+        angle = (float) Math.toDegrees(atan((destY-startY)/(destX-startX)));
+        System.out.println(String.valueOf(angle));
+        sprite.setOriginCenter();
+        sprite.rotate(angle+90);
+        //sprite.setRotation(angle);
         
         velocity = 200;
         
@@ -57,6 +61,8 @@ public class Arrow extends Actor
     @Override
     public void act(float delta)
     {
+        if((this.getX()==-100)&&(this.getY()==-100))
+            this.remove();
         super.act(delta);
     }
    
@@ -71,7 +77,7 @@ public class Arrow extends Actor
     @Override
     protected void positionChanged()
     {
-      sprite.setPosition(getX()+30, getY()-120);
+      sprite.setPosition(getX()+30, getY()-150);
       super.positionChanged();
     }
         

@@ -46,7 +46,6 @@ public class Footman extends Actor
         sprite = new Sprite(texture);
         sprite.setScale(0.65f);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        this.setZIndex((int) health);
         
        velocity = 80;
        inCombat = false;
