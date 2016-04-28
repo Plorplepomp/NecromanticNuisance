@@ -46,7 +46,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 import actors.Castle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.scottdennis.necromanticnuisance.PlayerCharacter;
 
 /**
  *
@@ -72,11 +75,18 @@ public class PlayScreen implements Screen
     public MoveToAction moveOff;
     public SequenceAction kill;
     public DelayAction stop;
+    public static World world;
+    PlayerCharacter player;
+    NecromanticNuisance game;
     
-    
-    public PlayScreen(NecromanticNuisance game)
+    public PlayScreen(NecromanticNuisance gm)
     {
+        game = gm;
+        
         viewport = new ScreenViewport();
+        
+        world = new World(new Vector2(0, 0), true);
+        player = new PlayerCharacter();
         
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("level1temp.tmx");
@@ -263,6 +273,11 @@ public class PlayScreen implements Screen
         update(delta);
         stage.act();
         stage.draw();
+        
+        game.batch.begin();
+        player.draw(game.batch);
+        game.batch.end();
+        
     }
     
     public void update(float delta)
@@ -356,7 +371,10 @@ public class PlayScreen implements Screen
             {
                 len = stageActors.size;
                 Actor b = stageActors.get(j);
-                if((abs(a.getX()-b.getX())<30) && (abs(a.getY()-b.getY())<30)&&(a.getX()!=0))
+                if((abs(a.getX()-b.getX())<30) 
+                        && (abs(a.getY()-b.getY())<30)
+                        &&(a.getX()>20 && a.getY()>20)
+                        &&(b.getX()>20 && b.getY()>20))
                 {
                     MoveToAction stopa = new MoveToAction();
                     stopa.setPosition(a.getX(), a.getY());
@@ -536,7 +554,7 @@ public class PlayScreen implements Screen
                     //Skeleton Castle Collision
                     //
                     
-                    if(("Skeleton".equals(a.getName())) && ("Castle".equals(b.getName())))
+                    if(("Skeleton".equals(a.getName())) && ("castle".equals(b.getName())))
                     {
                         a.addAction(stopa);
                         ((Castle) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
@@ -551,7 +569,7 @@ public class PlayScreen implements Screen
                             lose = true;
                         }
                     }
-                    else if (("Castle".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    else if (("castle".equals(a.getName())) && ("skeleton".equals(b.getName())))
                     {
                         b.addAction(stopb);
                         ((Castle) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
@@ -654,7 +672,7 @@ public class PlayScreen implements Screen
                         }
                         
                     }
-                    if (("archer".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    if (("archer".equals(b.getName())) && ("necromancer".equals(a.getName())))
                     {
                         b.clearActions();
                         b.addAction(stopb);
@@ -676,6 +694,47 @@ public class PlayScreen implements Screen
                         }
                     }
                 
+                    //
+                    // Castle skeleton combat
+                    //
+                    
+                    if (("castle".equals(a.getName())) && ("skeleton".equals(b.getName())))
+                    {
+                        if(((Castle) a).arrowTimer <= 0)
+                        {
+                            stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            ((Castle) a).arrowTimer = 3;
+                            ((BasicSkel) b).health -= 200 + archerDamage;
+                            if(((BasicSkel) b).health <= 0)
+                            {
+                                b.setName("dead");
+                                ((BasicSkel) b).health = 100000;
+                                b.clearActions();
+                                b.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                            }
+                        }
+                        
+                    }
+                    if (("castle".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    {
+                        if(((Castle) b).arrowTimer <= 0)
+                        {
+                            ((Castle) b).arrowTimer = 3;
+                            stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            ((BasicSkel) a).health -= 200 + archerDamage;
+                            if(((BasicSkel) a).health <= 0)
+                            {
+                                a.setName("dead");
+                                ((BasicSkel) a).health = 100000;
+                                a.clearActions();
+                                a.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                            }
+                        }
+                    }
                 
                 
                 }

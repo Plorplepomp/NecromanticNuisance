@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import screens.PlayScreen;
 
 public class NecromanticNuisance extends Game {
-	SpriteBatch batch;
+	public SpriteBatch batch;
         static public PlayScreen playScreen;
 	
 	@Override
