@@ -86,8 +86,8 @@ public class BasicSkel extends Actor
         ma6.setDuration((375-185)/velocity);
         
         ma7 = new MoveToAction();
-        ma7.setPosition(100f, 375f);
-        ma7.setDuration((310-100)/velocity);
+        ma7.setPosition(-40f, 375f);
+        ma7.setDuration((310+40)/velocity);
         
 
         SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
@@ -138,7 +138,7 @@ public class BasicSkel extends Actor
         }
         else if((y==375)&&(x<600))
         {
-            ma7.setDuration((1000-x)/velocity);
+            ma7.setDuration((x+40)/velocity);
             SequenceAction sa9 = new SequenceAction(init, ma7);
             this.addAction(sa9);
         }

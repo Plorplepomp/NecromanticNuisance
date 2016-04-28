@@ -21,21 +21,23 @@ public class Necromancer extends Actor
 {
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
-    public Sprite sprite;
+    public Sprite sprite, emptyHealthBar, fullHealthBar;
     public float health, damage;
     float velocity;
     
-    public Necromancer(float health, float damage, Stage stage)
+    public Necromancer(float hlth, float damage, Stage stage)
     {
         this.setName("necromancer");
         texture = new Texture("necromancer.png");
         sprite = new Sprite(texture);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
-        this.setZIndex((int)health);
+        health = hlth;
+        
+        emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
+        fullHealthBar = new Sprite(new Texture("fullBar.png"));
         velocity = 70;
-        //Rectangle body = new Rectangle(getX(), getY(), getWidth(), getHeight());
-        //ScaleByAction sba = new ScaleByAction();
-        //sba.setAmount(0.25f);
+
+        
         
         ms = new MoveToAction();
         ms.setPosition(940f,375f);
@@ -94,24 +96,19 @@ public class Necromancer extends Actor
     */
     }
 
-    @Override
-    public void setZIndex(int health)
-    {
-        this.health = (float)health;
-    }
-    
-    @Override
-    public int getZIndex()
-    {
-        return (int)this.health;
-    }
 
- /*   @Override
+   @Override
     public void act(float delta)
     {
-        Array<Actor> stageActors = stage.getActors();
+        emptyHealthBar.setPosition(this.getX()-20, this.getY()+100);
+        emptyHealthBar.setScale(3f, 0.65f);
+        fullHealthBar.setPosition(this.getX()-20, this.getY()+100);
+        fullHealthBar.setOrigin(0f,0f);
+        emptyHealthBar.setOrigin(0f,0f);
+        fullHealthBar.setScale(3*health/20000, 0.7f);
+        super.act(delta);
     }
- */
+ 
     
     @Override
     public void draw(Batch batch, float parentAlpha)
@@ -119,12 +116,16 @@ public class Necromancer extends Actor
         sprite.setColor(this.getColor());
         batch.setColor(this.getColor());
         sprite.draw(batch);
+        emptyHealthBar.draw(batch);
+        if(health<99999)
+            fullHealthBar.draw(batch);
     }
     
     @Override
     protected void positionChanged()
     {
       sprite.setPosition(getX(), getY());
+      
       /*
       body.x = getX();
       body.y = getY();

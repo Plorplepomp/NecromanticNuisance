@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import java.lang.Math;
+import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
 import static java.lang.Math.asin;
 import static java.lang.Math.atan;
@@ -37,7 +38,7 @@ public class Arrow extends Actor
         angle = (float) Math.toDegrees(atan((destY-startY)/(destX-startX)));
         System.out.println(String.valueOf(angle));
         sprite.setOriginCenter();
-        sprite.rotate(angle+90);
+        sprite.rotate(angle+270);
         //sprite.setRotation(angle);
         
         velocity = 200;
@@ -77,7 +78,7 @@ public class Arrow extends Actor
     @Override
     protected void positionChanged()
     {
-      sprite.setPosition(getX()+30, getY()-150);
+      sprite.setPosition(getX()+30, getY()-122);
       super.positionChanged();
     }
         
