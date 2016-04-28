@@ -11,7 +11,7 @@ import screens.PlayScreen;
 
 public class NecromanticNuisance extends Game {
 	SpriteBatch batch;
-        public PlayScreen playScreen;
+        static public PlayScreen playScreen;
 	
 	@Override
 	public void create () 

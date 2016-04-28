@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.ScaleByAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 
 /**
  *
@@ -24,7 +25,7 @@ public class BasicSkel extends Actor
 {
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10, init;
-    public Sprite sprite;
+    public Sprite sprite, emptyHealthBar, fullHealthBar;
     public float health;
     public float damage;
     float velocity;
@@ -45,7 +46,10 @@ public class BasicSkel extends Actor
         sprite.setScale(0.65f);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
         
-        this.setZIndex((int)health);
+        emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
+        fullHealthBar = new Sprite(new Texture("fullBar.png"));
+        
+        
         velocity = 70;
         //Rectangle body = new Rectangle(getX(), getY(), getWidth(), getHeight());
         //ScaleByAction sba = new ScaleByAction();
@@ -149,30 +153,27 @@ public class BasicSkel extends Actor
     */
     }
 
-    @Override
-    public void setZIndex(int health)
-    {
-        this.health = (float)health;
-    }
-    
-    @Override
-    public int getZIndex()
-    {
-        return (int)this.health;
-    }
 
- /*   @Override
+   @Override
     public void act(float delta)
     {
-        Array<Actor> stageActors = stage.getActors();
+        emptyHealthBar.setPosition(this.getX()+32, this.getY()+65);
+        emptyHealthBar.setScale(1f, 0.65f);
+        fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
+        fullHealthBar.setOrigin(0f,0f);
+        fullHealthBar.setScale(health/NecromanticNuisance.playScreen.skelHealth, 0.7f);
+        super.act(delta);
     }
- */
+
     
     public void draw(Batch batch, float parentAlpha)
     {
         sprite.setColor(this.getColor());
         batch.setColor(this.getColor());
         sprite.draw(batch);
+        emptyHealthBar.draw(batch);
+        if(health<99999)
+            fullHealthBar.draw(batch);
     }
     
     @Override

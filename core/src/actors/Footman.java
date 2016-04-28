@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 
 /**
  *
@@ -22,7 +23,7 @@ public class Footman extends Actor
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17, init;
-    Sprite sprite;
+    Sprite sprite, emptyHealthBar, fullHealthBar;
     public boolean inCombat;
     public float health;
     public float damage;
@@ -46,6 +47,9 @@ public class Footman extends Actor
         sprite = new Sprite(texture);
         sprite.setScale(0.65f);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        
+        emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
+        fullHealthBar = new Sprite(new Texture("fullBar.png"));
         
        velocity = 80;
        inCombat = false;
@@ -156,16 +160,23 @@ public class Footman extends Actor
     @Override
     public void act(float delta)
     {
-        if(!inCombat)
-            super.act(delta);
-//        inCombat = false;
+        emptyHealthBar.setPosition(this.getX()+32, this.getY()+65);
+        emptyHealthBar.setScale(1f, 0.65f);
+        fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
+        fullHealthBar.setOrigin(0f,0f);
+        fullHealthBar.setScale(health/NecromanticNuisance.playScreen.footHealth, 0.7f);
+        super.act(delta);
     }
    
     public void draw(Batch batch, float parentAlpha)
     {
+        
         sprite.setColor(this.getColor());
         batch.setColor(this.getColor());
         sprite.draw(batch);
+        emptyHealthBar.draw(batch);
+        if(health<99999)
+            fullHealthBar.draw(batch);
     }
     
     

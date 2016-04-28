@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.utils.Array;
+import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 
 /**
@@ -23,7 +24,7 @@ import static java.lang.Math.abs;
 public class Archer extends Actor
 {
     public float health, damage, arrowTimer;
-    Sprite sprite;
+    Sprite sprite, emptyHealthBar, fullHealthBar;
     float velocity;
     Texture texture;
     public boolean notmoving;
@@ -43,6 +44,9 @@ public class Archer extends Actor
         sprite = new Sprite(texture);
         sprite.setScale(0.65f);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
+        
+        emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
+        fullHealthBar = new Sprite(new Texture("fullBar.png"));
         
         velocity = 50;
        
@@ -148,28 +152,12 @@ public class Archer extends Actor
     @Override
     public void act(float delta)
     {
+        emptyHealthBar.setPosition(this.getX()+32, this.getY()+65);
+        emptyHealthBar.setScale(1f, 0.65f);
+        fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
+        fullHealthBar.setOrigin(0f,0f);
+        fullHealthBar.setScale(health/NecromanticNuisance.playScreen.archerHealth, 0.7f);
         arrowTimer -= delta;
-        /*arrowTimer -= delta;
-        if(arrowTimer <= 0)
-        {
-            Array<Actor> stageActors = stage.getActors();
-            for(int i=0; i<len; i++)
-            {
-                len = stageActors.size;
-                Actor a = stageActors.get(i);
-                if((abs(this.getX()-a.getX())<100) && (abs(this.getY()-a.getY())<100)&&(a.getX()!=0))
-                {
-                    if(("skeleton".equals(a.getName())))
-                    {
-                        MoveToAction stop = new MoveToAction();
-                        stop.setPosition(this.getX(), this.getY());
-                        this.clearActions();
-                        this.addAction(stop);
-                    }
-                }
-            }
-            arrowTimer = 1;
-        }*/
         super.act(delta);
     }
    
@@ -179,6 +167,9 @@ public class Archer extends Actor
         sprite.setColor(this.getColor());
         batch.setColor(this.getColor());
         sprite.draw(batch);
+        emptyHealthBar.draw(batch);
+        if(health<99999)
+            fullHealthBar.draw(batch);
     }
     
     @Override

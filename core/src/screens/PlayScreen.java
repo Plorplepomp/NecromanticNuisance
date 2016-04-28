@@ -62,8 +62,8 @@ public class PlayScreen implements Screen
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose;
     public int gold, archerRange;
-    float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
-    float archerHealth, archerDamage, archerMoveTimer;
+    public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
+    public float archerHealth, archerDamage, archerMoveTimer;
     public Sound skeletonDeath, footmanDeath, dropSword;
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
@@ -377,7 +377,7 @@ public class PlayScreen implements Screen
                         if(((Footman) a).health <= 0)
                         {
                             a.setName("dead");
-                            ((Footman) a).health = 10000;
+                            ((Footman) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -388,7 +388,7 @@ public class PlayScreen implements Screen
                         if(((BasicSkel) b).health <= 0)
                         {
                             b.setName("dead");
-                            ((BasicSkel) b).health = 10000;
+                            ((BasicSkel) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
@@ -409,7 +409,7 @@ public class PlayScreen implements Screen
                         if(((BasicSkel) a).health <= 0)
                         {
                             a.setName("dead");
-                            ((BasicSkel) a).health = 10000;
+                            ((BasicSkel) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             skeletonDeath.play(1.0f);
@@ -420,7 +420,7 @@ public class PlayScreen implements Screen
                         if(((Footman) b).health <= 0)
                         {
                             b.setName("dead");
-                            ((Footman) b).health = 10000;
+                            ((Footman) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -445,7 +445,7 @@ public class PlayScreen implements Screen
                         {
                             ((Archer) a).notmoving = false;
                             a.setName("dead");
-                            ((Archer) a).health = 10000;
+                            ((Archer) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -463,7 +463,7 @@ public class PlayScreen implements Screen
                         {
                             ((Archer) b).notmoving = false;
                             b.setName("dead");
-                            ((Archer) b).health = 10000;
+                            ((Archer) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -484,7 +484,7 @@ public class PlayScreen implements Screen
                         if(((Footman) a).health <= 0)
                         {
                             a.setName("dead");
-                            ((Footman) a).health = 10000;
+                            ((Footman) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -493,7 +493,7 @@ public class PlayScreen implements Screen
                         if(((Necromancer) b).health <= 0)
                         {
                             b.setName("dead");
-                            ((Necromancer) b).health = 10000;
+                            ((Necromancer) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
@@ -511,7 +511,7 @@ public class PlayScreen implements Screen
                         if(((Necromancer) a).health <= 0)
                         {
                             a.setName("dead");
-                            ((Necromancer) a).health = 10000;
+                            ((Necromancer) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             skeletonDeath.play(1.0f);
@@ -523,7 +523,7 @@ public class PlayScreen implements Screen
                         if(((Footman) b).health <= 0)
                         {
                             b.setName("dead");
-                            ((Footman) b).health = 10000;
+                            ((Footman) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             footmanDeath.play(1.0f);
@@ -543,7 +543,7 @@ public class PlayScreen implements Screen
                         if(((Castle) b).health <= 0)
                         {
                             b.setName("dead");
-                            ((Castle) b).health = 10000;
+                            ((Castle) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
                             stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
@@ -558,7 +558,7 @@ public class PlayScreen implements Screen
                         if(((Castle) a).health <= 0)
                         {
                             a.setName("dead");
-                            ((Castle) a).health = 10000;
+                            ((Castle) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
                             stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
@@ -597,7 +597,7 @@ public class PlayScreen implements Screen
                             if(((BasicSkel) b).health <= 0)
                             {
                                 b.setName("dead");
-                                ((BasicSkel) b).health = 10000;
+                                ((BasicSkel) b).health = 100000;
                                 b.clearActions();
                                 b.addAction(kill);
                                 skeletonDeath.play(1.0f);
@@ -619,7 +619,7 @@ public class PlayScreen implements Screen
                             if(((BasicSkel) a).health <= 0)
                             {
                                 a.setName("dead");
-                                ((BasicSkel) a).health = 10000;
+                                ((BasicSkel) a).health = 100000;
                                 a.clearActions();
                                 a.addAction(kill);
                                 skeletonDeath.play(1.0f);
@@ -645,7 +645,7 @@ public class PlayScreen implements Screen
                             if(((Necromancer) b).health <= 0)
                             {
                                 b.setName("dead");
-                                ((Necromancer) b).health = 10000;
+                                ((Necromancer) b).health = 100000;
                                 b.clearActions();
                                 b.addAction(kill);
                                 skeletonDeath.play(1.0f);
@@ -667,7 +667,7 @@ public class PlayScreen implements Screen
                             if(((Necromancer) a).health <= 0)
                             {
                                 a.setName("dead");
-                                ((Necromancer) a).health = 10000;
+                                ((Necromancer) a).health = 100000;
                                 a.clearActions();
                                 a.addAction(kill);
                                 skeletonDeath.play(1.0f);
