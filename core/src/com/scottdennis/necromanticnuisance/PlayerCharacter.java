@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -24,20 +25,21 @@ public class PlayerCharacter extends Sprite
 {
     public Body b2body;
     Texture texture;
-    private World world;
-    PolygonShape shape;
+    public World world;
+    CircleShape shape;
     
-    public void PlayerCharacter()
+    public PlayerCharacter(World world)
     {   
         texture = new Texture("footman3.png");
         this.setTexture(texture);
-        this.world = PlayScreen.world;
+        this.world = world;
         
         BodyDef bdef = new BodyDef();
         bdef.position.set(300, 300);
         bdef.type = BodyDef.BodyType.DynamicBody;
         b2body = world.createBody(bdef);
-                
+         
+        /*
         FixtureDef fdef = new FixtureDef();
         shape = new PolygonShape();
         Vector2[] vertice = new Vector2[4];
@@ -47,6 +49,11 @@ public class PlayerCharacter extends Sprite
         vertice[3] = new Vector2(25, -65);
         shape.set(vertice);
         fdef.friction = 25;
+        fdef.shape = shape;
+        */
+        FixtureDef fdef = new FixtureDef();
+        shape = new CircleShape();
+        shape.setRadius(15f);
         fdef.shape = shape;
         b2body.createFixture(fdef);
         this.setBounds(b2body.getPosition().x, b2body.getPosition().y, this.getHeight(), this.getWidth());
@@ -59,7 +66,7 @@ public class PlayerCharacter extends Sprite
     
     public void draw(SpriteBatch batch)
     {
-        super.draw(batch);
+//        super.draw(batch);
     }
     
 }

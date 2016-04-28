@@ -41,7 +41,7 @@ public class Arrow extends Actor
         sprite.rotate(angle+270);
         //sprite.setRotation(angle);
         
-        velocity = 200;
+        velocity = 300;
         
         init = new MoveToAction();
         init.setPosition(startX, startY);

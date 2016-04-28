@@ -46,8 +46,16 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 import actors.Castle;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.scottdennis.necromanticnuisance.PlayerCharacter;
 
@@ -75,7 +83,8 @@ public class PlayScreen implements Screen
     public MoveToAction moveOff;
     public SequenceAction kill;
     public DelayAction stop;
-    public static World world;
+    public World world;
+    private Box2DDebugRenderer b2dr;
     PlayerCharacter player;
     NecromanticNuisance game;
     
@@ -86,11 +95,30 @@ public class PlayScreen implements Screen
         viewport = new ScreenViewport();
         
         world = new World(new Vector2(0, 0), true);
-        player = new PlayerCharacter();
+        b2dr = new Box2DDebugRenderer();
+        
+        player = new PlayerCharacter(world);
         
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("level1temp.tmx");
         renderer = new OrthogonalTiledMapRenderer(map);
+        
+        BodyDef bdef = new BodyDef();
+        PolygonShape shape = new PolygonShape();
+        FixtureDef fdef = new FixtureDef();
+        Body body;
+        
+        for(MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class))
+        {
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            bdef.type = BodyDef.BodyType.StaticBody;
+            bdef.position.set(rect.getX() + rect.getWidth()/2, rect.getY() + rect.getHeight()/2);
+            body = world.createBody(bdef);
+            shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
+            fdef.shape = shape;
+            body.createFixture(fdef);
+        }
+        
         
         recruitTimer = 15;
         recruitReset = 0;
@@ -273,6 +301,7 @@ public class PlayScreen implements Screen
         update(delta);
         stage.act();
         stage.draw();
+        b2dr.render(world, stage.getCamera().combined);
         
         game.batch.begin();
         player.draw(game.batch);
@@ -289,6 +318,7 @@ public class PlayScreen implements Screen
         moveOff.setPosition(-100, -100);
         kill = new SequenceAction(red, moveOff);
         
+        world.step(1/60f, 6, 2);
         
         recruitTimer -= 1*delta;;
         spawnTimer -= 1*delta;
@@ -922,6 +952,7 @@ public class PlayScreen implements Screen
     public void dispose() 
     {
         stage.dispose();
+        world.dispose();
     }
     
 }
