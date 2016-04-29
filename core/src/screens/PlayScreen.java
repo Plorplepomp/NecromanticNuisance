@@ -318,6 +318,8 @@ public class PlayScreen implements Screen
         moveOff.setPosition(-100, -100);
         kill = new SequenceAction(red, moveOff);
         
+        handleInput();
+        
         world.step(1/60f, 6, 2);
         
         recruitTimer -= 1*delta;;
