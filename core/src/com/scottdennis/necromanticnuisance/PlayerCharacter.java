@@ -30,13 +30,16 @@ public class PlayerCharacter extends Sprite
     
     public PlayerCharacter(World world)
     {   
-        texture = new Texture("footman3.png");
-        this.setTexture(texture);
+        //super(new Texture("footman3.png"));
+        texture = new Texture("goodWiz.png");
+//        setTexture(texture);
         this.world = world;
         
+        
         BodyDef bdef = new BodyDef();
-        bdef.position.set(300, 300);
+        bdef.position.set(100, 400);
         bdef.type = BodyDef.BodyType.DynamicBody;
+        bdef.linearDamping = 2;
         b2body = world.createBody(bdef);
          
         /*
@@ -56,7 +59,9 @@ public class PlayerCharacter extends Sprite
         shape.setRadius(15f);
         fdef.shape = shape;
         b2body.createFixture(fdef);
-        this.setBounds(b2body.getPosition().x, b2body.getPosition().y, this.getHeight(), this.getWidth());
+        
+        setBounds(0, 0, 64, 64);
+        setRegion(texture);
     }
     
     public void update(float dt)
@@ -64,9 +69,5 @@ public class PlayerCharacter extends Sprite
         setPosition(b2body.getPosition().x - getWidth() / 2, b2body.getPosition().y - getHeight() / 2);
     }
     
-    public void draw(SpriteBatch batch)
-    {
-//        super.draw(batch);
-    }
     
 }

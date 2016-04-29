@@ -46,6 +46,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 import actors.Castle;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
@@ -72,10 +73,12 @@ public class PlayScreen implements Screen
     private OrthogonalTiledMapRenderer renderer;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose;
-    public int gold, archerRange;
+    public int gold, archerRange, playerSpell;
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
-    public float archerHealth, archerDamage, archerMoveTimer;
-    public Sound skeletonDeath, footmanDeath, dropSword;
+    public float archerHealth, archerDamage, archerMoveTimer, playerRange, playerDamage;
+    static public Sound skeletonDeath;
+    public Sound footmanDeath, dropSword, arrowShot;
+    public Music gameMusic;
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
     public Label goldCount;
@@ -85,7 +88,7 @@ public class PlayScreen implements Screen
     public DelayAction stop;
     public World world;
     private Box2DDebugRenderer b2dr;
-    PlayerCharacter player;
+    public PlayerCharacter player;
     NecromanticNuisance game;
     
     public PlayScreen(NecromanticNuisance gm)
@@ -98,6 +101,7 @@ public class PlayScreen implements Screen
         b2dr = new Box2DDebugRenderer();
         
         player = new PlayerCharacter(world);
+        playerSpell = 1;
         
         mapLoader = new TmxMapLoader();
         map = mapLoader.load("level1temp.tmx");
@@ -139,10 +143,15 @@ public class PlayScreen implements Screen
         skelHealth = 1100;
         skelDamage = 160+difficulty;
         
+        playerRange = 200;
+        playerDamage = 50;
+        
         skeletonDeath = Gdx.audio.newSound(Gdx.files.internal("skeletondeath.wav"));
         footmanDeath = Gdx.audio.newSound(Gdx.files.internal("footmanDeath.wav"));
         dropSword = Gdx.audio.newSound(Gdx.files.internal("dropSword.wav"));
-        
+        arrowShot = Gdx.audio.newSound(Gdx.files.internal("arrow.wav"));
+        gameMusic = Gdx.audio.newMusic(Gdx.files.internal("curseofthescarab.mp3"));
+        gameMusic.play();
         
         stage = new Stage(viewport);
         
@@ -173,6 +182,8 @@ public class PlayScreen implements Screen
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
         TextButton button5 = new TextButton("  Train Archer 10g ", textButtonStyle);
         TextButton button6 = new TextButton("  Increase Archer Range 30g  ", textButtonStyle);
+        TextButton button7 = new TextButton("  Select Fireball  ", textButtonStyle);
+        TextButton button8 = new TextButton("  Select Icebolt  ", textButtonStyle);
         
         button1.addListener(new ChangeListener() 
         {
@@ -255,6 +266,23 @@ public class PlayScreen implements Screen
             }
         });
         
+        button7.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                playerSpell = 1;
+            }
+        });
+        
+        button8.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                playerSpell = 2;
+            }
+        });
         
         Label goldLabel = new Label("Gold: ", new Label.LabelStyle(font, BLACK));
         Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
@@ -266,14 +294,16 @@ public class PlayScreen implements Screen
         table.row();
         table.add(button1).size(315f, 40f).colspan(2);
         table.add(button5).size(315f, 40f).colspan(2);
+        table.add(button7).size(315f, 40f).colspan(2);
         table.row();
         table.add(button2).size(315f, 40f).colspan(2);
         table.add(button6).size(315f, 40f).colspan(2);
+        table.add(button8).size(315f, 40f).colspan(2);
         table.row();
         table.add(button3).size(315f, 40f).colspan(2);
         table.row();
         table.add(button4).size(315f, 40f).colspan(2);
-        table.setPosition(310f, 100f);
+        table.setPosition(510f, 100f);
         stage.addActor(table);
         table.setName("table");
 
@@ -286,6 +316,10 @@ public class PlayScreen implements Screen
            
     }
     
+    public void addGold(int addition)
+    {
+        gold += addition;
+    }
     
 
     @Override
@@ -297,16 +331,41 @@ public class PlayScreen implements Screen
     {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         renderer.setView((OrthographicCamera) stage.getCamera());
+//        b2dr.render(world, stage.getCamera().combined);
         renderer.render();
         update(delta);
+                
+        
         stage.act();
         stage.draw();
-        b2dr.render(world, stage.getCamera().combined);
         
-        game.batch.begin();
-        player.draw(game.batch);
-        game.batch.end();
+        stage.getBatch().begin();
+        player.draw(stage.getBatch());
+        stage.getBatch().end();
         
+//        b2dr.render(world, stage.getCamera().combined);
+       
+//        game.batch.setProjectionMatrix(stage.getCamera().combined);
+//        stage.getBatch().begin();
+//        game.batch.begin();
+//        player.draw(game.batch);
+//        stage.getBatch().end();
+//        game.batch.end();
+        
+    }
+    
+    public void handleInput(float delta)
+    {
+        if(Gdx.input.isKeyPressed(Input.Keys.W))
+            player.b2body.applyLinearImpulse(new Vector2(0, 4f), player.b2body.getWorldCenter(), true);
+        if(Gdx.input.isKeyPressed(Input.Keys.A))
+            player.b2body.applyLinearImpulse(new Vector2(-4f, 0), player.b2body.getWorldCenter(), true);
+        if(Gdx.input.isKeyPressed(Input.Keys.S))
+            player.b2body.applyLinearImpulse(new Vector2(0, -4f), player.b2body.getWorldCenter(), true);
+        if(Gdx.input.isKeyPressed(Input.Keys.D))
+            player.b2body.applyLinearImpulse(new Vector2(4f, 0), player.b2body.getWorldCenter(), true);
+//        if(Gdx.input.isKeyJustPressed(Input.Buttons.LEFT))
+//            stage.
     }
     
     public void update(float delta)
@@ -318,7 +377,8 @@ public class PlayScreen implements Screen
         moveOff.setPosition(-100, -100);
         kill = new SequenceAction(red, moveOff);
         
-        handleInput();
+        player.update(delta);
+        handleInput(delta);
         
         world.step(1/60f, 6, 2);
         
@@ -333,11 +393,11 @@ public class PlayScreen implements Screen
         {
             skelDamage = 160 + difficulty;
             if(win==false)
-                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 375f, stage));
+                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 375f, stage, this));
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
-            difficulty += 1;
+            difficulty += 2;
         }
         
         if(recruitTimer == 0)
@@ -430,9 +490,9 @@ public class PlayScreen implements Screen
                             ((Footman) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            footmanDeath.play(0.7f);
+                            dropSword.play(0.7f);
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
                             ((BasicSkel) b).remove();
                         }
                         if(((BasicSkel) b).health <= 0)
@@ -473,9 +533,9 @@ public class PlayScreen implements Screen
                             ((Footman) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            footmanDeath.play(0.7f);
+                            dropSword.play(0.7f);
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
                             ((BasicSkel) a).remove();
                         }
                         
@@ -498,8 +558,8 @@ public class PlayScreen implements Screen
                             ((Archer) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            footmanDeath.play(0.7f);
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
                             ((BasicSkel) b).remove();
                         }
                     }
@@ -516,8 +576,8 @@ public class PlayScreen implements Screen
                             ((Archer) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            footmanDeath.play(0.7f);
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
                             ((BasicSkel) a).remove();
                         }
                     }
@@ -537,8 +597,8 @@ public class PlayScreen implements Screen
                             ((Footman) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);
+                            footmanDeath.play(0.7f);
+                            dropSword.play(0.7f);
                         }
                         if(((Necromancer) b).health <= 0)
                         {
@@ -576,8 +636,8 @@ public class PlayScreen implements Screen
                             ((Footman) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
-                            footmanDeath.play(1.0f);
-                            dropSword.play(1.0f);
+                            footmanDeath.play(0.7f);
+                            dropSword.play(0.7f);
                         }
                         
                     }
@@ -596,7 +656,7 @@ public class PlayScreen implements Screen
                             ((Castle) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage));
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
                             ((BasicSkel) a).remove();
                             lose = true;
                         }
@@ -611,7 +671,7 @@ public class PlayScreen implements Screen
                             ((Castle) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage));
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
                             ((BasicSkel) b).remove();
                             lose = true;
                         }
@@ -642,6 +702,7 @@ public class PlayScreen implements Screen
                         if(((Archer) a).arrowTimer <= 0)
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            arrowShot.play(1.0f);
                             ((Archer) a).arrowTimer = 3;
                             ((BasicSkel) b).health -= archerDamage;
                             if(((BasicSkel) b).health <= 0)
@@ -665,6 +726,7 @@ public class PlayScreen implements Screen
                         {
                             ((Archer) b).arrowTimer = 3;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            arrowShot.play(1.0f);
                             ((BasicSkel) a).health -= archerDamage;
                             if(((BasicSkel) a).health <= 0)
                             {
@@ -690,6 +752,7 @@ public class PlayScreen implements Screen
                         if(((Archer) a).arrowTimer <= 0)
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            arrowShot.play(1.0f);
                             ((Archer) a).arrowTimer = 3;
                             ((Necromancer) b).health -= archerDamage;
                             if(((Necromancer) b).health <= 0)
@@ -713,6 +776,7 @@ public class PlayScreen implements Screen
                         {
                             ((Archer) b).arrowTimer = 3;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            arrowShot.play(1.0f);
                             ((Necromancer) a).health -= archerDamage;
                             if(((Necromancer) a).health <= 0)
                             {
@@ -735,6 +799,7 @@ public class PlayScreen implements Screen
                         if(((Castle) a).arrowTimer <= 0)
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
+                            arrowShot.play(1.0f);
                             ((Castle) a).arrowTimer = 3;
                             ((BasicSkel) b).health -= 200 + archerDamage;
                             if(((BasicSkel) b).health <= 0)
@@ -755,6 +820,7 @@ public class PlayScreen implements Screen
                         {
                             ((Castle) b).arrowTimer = 3;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            arrowShot.play(1.0f);
                             ((BasicSkel) a).health -= 200 + archerDamage;
                             if(((BasicSkel) a).health <= 0)
                             {

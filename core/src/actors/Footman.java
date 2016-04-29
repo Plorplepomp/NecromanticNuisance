@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
@@ -50,6 +51,8 @@ public class Footman extends Actor
         
         emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
         fullHealthBar = new Sprite(new Texture("fullBar.png"));
+        
+        setTouchable(Touchable.disabled);
         
        velocity = 80;
        inCombat = false;
