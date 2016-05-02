@@ -414,6 +414,27 @@ public class PlayScreen implements Screen
             }
         }
         
+            
+        if(lose == true)
+        {
+            Label lost = new Label("YOU LOSE!", new Label.LabelStyle(font, BLACK));
+            lost.setPosition(455f, 380f);
+            Label playAgain = new Label("Play Again?", new Label.LabelStyle(font, BLACK));
+            playAgain.setPosition(450f, 340f);
+            stage.addActor(lost);
+            stage.addActor(playAgain);
+            lose = false;
+        }
+            
+        if(win == true)
+        {
+            Label won = new Label("YOU WIN!", new Label.LabelStyle(font, BLACK));
+            won.setPosition(455f, 380f);                
+            stage.addActor(won);
+            win = false;
+        }
+            
+        
         Array<Actor> stageActors = stage.getActors();
         int len = stageActors.size;
         for(int i=0; i<len; i++)
@@ -429,29 +450,6 @@ public class PlayScreen implements Screen
                 len = stageActors.size;
             }
             
-            if((a.getX() == 195f) && (a.getY() == 800f))
-            {
-                a.remove();
-                lives--;
-                if(lives==9)
-                {
-                    lose = true;
-                    Label lost = new Label("YOU LOSE!", new Label.LabelStyle(font, BLACK));
-                    lost.setPosition(455f, 380f);
-                    stage.addActor(lost);
-                    len = stageActors.size;
-                }
-                len = stageActors.size;
-            }
-            
-            if(("footman".equals(a.getName()))&&(a.getX()==950f)&&(a.getY()==610f))
-            {
-                win = true;
-                Label won = new Label("YOU WIN!", new Label.LabelStyle(font, BLACK));
-                won.setPosition(455f, 380f);
-                stage.addActor(won);
-                len = stageActors.size;
-            }
             
             if(("skeleton".equals(a.getName()))&&(win==true))
             {
