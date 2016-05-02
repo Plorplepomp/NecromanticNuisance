@@ -22,7 +22,7 @@ public class Necromancer extends Actor
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     public Sprite sprite, emptyHealthBar, fullHealthBar;
-    public float health, damage;
+    public float health, damage, attackTimer;
     float velocity;
     
     public Necromancer(float hlth, float damage, Stage stage)
@@ -32,6 +32,7 @@ public class Necromancer extends Actor
         sprite = new Sprite(texture);
         setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
         health = hlth;
+        attackTimer = 2;
         
         emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
         fullHealthBar = new Sprite(new Texture("fullBar.png"));

@@ -46,6 +46,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.scottdennis.necromanticnuisance.NecromanticNuisance;
 import static java.lang.Math.abs;
 import actors.Castle;
+import actors.NecromancerAttack;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -77,7 +78,7 @@ public class PlayScreen implements Screen
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
     public float archerHealth, archerDamage, archerMoveTimer, playerRange, playerDamage;
     static public Sound skeletonDeath;
-    public Sound footmanDeath, dropSword, arrowShot;
+    public Sound footmanDeath, dropSword, arrowShot, spellSound;
     public Music gameMusic;
     public boolean soundPlayed, castleSpawned;
     BitmapFont font;
@@ -150,6 +151,7 @@ public class PlayScreen implements Screen
         footmanDeath = Gdx.audio.newSound(Gdx.files.internal("footmanDeath.wav"));
         dropSword = Gdx.audio.newSound(Gdx.files.internal("dropSword.wav"));
         arrowShot = Gdx.audio.newSound(Gdx.files.internal("arrow.wav"));
+        spellSound = Gdx.audio.newSound(Gdx.files.internal("fireball.wav"));
         gameMusic = Gdx.audio.newMusic(Gdx.files.internal("curseofthescarab.mp3"));
         gameMusic.play();
         
@@ -834,7 +836,48 @@ public class PlayScreen implements Screen
                 
                 
                 }
-                
+                if((abs(a.getX()-b.getX())<200) && (abs(a.getY()-b.getY())<200)&&(a.getX()!=0))
+                {
+                    if (("necromancer".equals(a.getName())) && ("footman".equals(b.getName())))
+                    {
+                        if(((Necromancer) a).attackTimer <= 0)
+                        {
+                            stage.addActor(new NecromancerAttack(a.getX(), a.getY(), b.getX(), b.getY()));
+                            arrowShot.play(1.0f);
+                            ((Castle) a).arrowTimer = 3;
+                            ((BasicSkel) b).health -= 200 + archerDamage;
+                            if(((BasicSkel) b).health <= 0)
+                            {
+                                b.setName("dead");
+                                ((BasicSkel) b).health = 100000;
+                                b.clearActions();
+                                b.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                            }
+                        }
+                        
+                    }
+                    if (("castle".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                    {
+                        if(((Castle) b).arrowTimer <= 0)
+                        {
+                            ((Castle) b).arrowTimer = 3;
+                            stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
+                            arrowShot.play(1.0f);
+                            ((BasicSkel) a).health -= 200 + archerDamage;
+                            if(((BasicSkel) a).health <= 0)
+                            {
+                                a.setName("dead");
+                                ((BasicSkel) a).health = 100000;
+                                a.clearActions();
+                                a.addAction(kill);
+                                skeletonDeath.play(1.0f);
+                                gold += 5;
+                            }
+                        }
+                    }
+                }
                 
                 
                 archerMoveTimer -= Gdx.graphics.getDeltaTime();
@@ -846,6 +889,8 @@ public class PlayScreen implements Screen
                     len = stageActors.size;
                     archerMoveTimer = 50;
                 }
+                
+                
                 
                 
                 /*
