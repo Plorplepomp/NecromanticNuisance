@@ -75,7 +75,7 @@ public class PlayScreen implements Screen
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose, loseLabel;
     public int gold, archerRange, playerSpell;
-    public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth;
+    public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth, archerSpeed;
     public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage;
     static public Sound skeletonDeath;
     public Sound footmanDeath, dropSword, arrowShot, spellSound;
@@ -140,9 +140,12 @@ public class PlayScreen implements Screen
         
         footHealth = 1000;
         footDamage = 300;
+        
         archerHealth = 500;
-        archerDamage = 300;
+        archerDamage = 250;
+        archerSpeed = 0;
         archerRange = 100;
+        
         skelHealth = 1100;
         skelDamage = 160+difficulty;
         
@@ -184,11 +187,13 @@ public class PlayScreen implements Screen
         TextButton button2 = new TextButton("  Increase Soldier Health 30g  ", textButtonStyle);
         TextButton button3 = new TextButton("  Increase Soldier Training Speed 50g  ", textButtonStyle);
         TextButton button4 = new TextButton("  Train Juggernaut 50g ", textButtonStyle);
-        TextButton button5 = new TextButton("  Train Archer 10g ", textButtonStyle);
+        TextButton button5 = new TextButton("  Train Archer 20g ", textButtonStyle);
         TextButton button6 = new TextButton("  Increase Archer Range 30g  ", textButtonStyle);
         TextButton button7 = new TextButton("  Select Fireball  ", textButtonStyle);
         TextButton button8 = new TextButton("  Select Icebolt  ", textButtonStyle);
         TextButton button9 = new TextButton("  Select Poison Wave  ", textButtonStyle);
+        TextButton button10 = new TextButton("  Increase Archer Damage 30g  ", textButtonStyle);
+        TextButton button11 = new TextButton("  Increase Archer FireRate 30g", textButtonStyle);
         
         button1.addListener(new ChangeListener() 
         {
@@ -298,6 +303,19 @@ public class PlayScreen implements Screen
             }
         });
         
+        button10.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                if(gold >= 30)
+                {
+                    gold -= 30;
+                    archerDamage += 30;
+                }
+            }
+        });
+        
         
         Label goldLabel = new Label("Gold: ", new Label.LabelStyle(font, BLACK));
         Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
@@ -316,6 +334,7 @@ public class PlayScreen implements Screen
         table.add(button8).size(315f, 40f).colspan(2);
         table.row();
         table.add(button3).size(315f, 40f).colspan(2);
+        table.add(button10).size(315f, 40f).colspan(2);
         table.add(button9).size(315f, 40f).colspan(2);
         table.row();
         table.add(button4).size(315f, 40f).colspan(2);
@@ -727,7 +746,7 @@ public class PlayScreen implements Screen
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
                             arrowShot.play(1.0f);
-                            ((Archer) a).arrowTimer = 3;
+                            ((Archer) a).arrowTimer = 3 - archerSpeed;
                             ((BasicSkel) b).health -= archerDamage;
                             if(((BasicSkel) b).health <= 0)
                             {
@@ -748,7 +767,7 @@ public class PlayScreen implements Screen
                         ((Archer) b).notmoving = true;
                         if(((Archer) b).arrowTimer <= 0)
                         {
-                            ((Archer) b).arrowTimer = 3;
+                            ((Archer) b).arrowTimer = 3 - archerSpeed;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
                             arrowShot.play(1.0f);
                             ((BasicSkel) a).health -= archerDamage;
@@ -777,7 +796,7 @@ public class PlayScreen implements Screen
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
                             arrowShot.play(1.0f);
-                            ((Archer) a).arrowTimer = 3;
+                            ((Archer) a).arrowTimer = 3 - archerSPeed;
                             ((Necromancer) b).health -= archerDamage;
                             if(((Necromancer) b).health <= 0)
                             {
@@ -798,7 +817,7 @@ public class PlayScreen implements Screen
                         ((Archer) b).notmoving = true;
                         if(((Archer) b).arrowTimer <= 0)
                         {
-                            ((Archer) b).arrowTimer = 3;
+                            ((Archer) b).arrowTimer = 3 - archerSpeed;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
                             arrowShot.play(1.0f);
                             ((Necromancer) a).health -= archerDamage;
@@ -824,7 +843,7 @@ public class PlayScreen implements Screen
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
                             arrowShot.play(1.0f);
-                            ((Castle) a).arrowTimer = 3;
+                            ((Castle) a).arrowTimer = 3 - archerSpeed;
                             ((BasicSkel) b).health -= 200 + archerDamage;
                             if(((BasicSkel) b).health <= 0)
                             {
@@ -842,7 +861,7 @@ public class PlayScreen implements Screen
                     {
                         if(((Castle) b).arrowTimer <= 0)
                         {
-                            ((Castle) b).arrowTimer = 3;
+                            ((Castle) b).arrowTimer = 3 - archerSpeed;
                             stage.addActor(new Arrow(b.getX(), b.getY(), a.getX(), a.getY()));
                             arrowShot.play(1.0f);
                             ((BasicSkel) a).health -= 200 + archerDamage;
@@ -948,6 +967,16 @@ public class PlayScreen implements Screen
                     }
                 }
                 
+                 if((abs(a.getX()-b.getX())<100) && (abs(a.getY()-b.getY())<100)&&(a.getX()!=0))
+                 {
+                     if (("skeleton".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                     {
+                         if(((BasicSkel) a).poisoned)
+                             ((BasicSkel) b).poisoned = true;
+                         if(((BasicSkel) b).poisoned)
+                             ((BasicSkel) a).poisoned = true;
+                     }
+                 }
                 
                 archerMoveTimer -= Gdx.graphics.getDeltaTime();
                 if("archer".equals(a.getName()) && ((Archer) a).notmoving && (archerMoveTimer <= 0))

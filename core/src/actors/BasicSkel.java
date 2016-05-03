@@ -124,7 +124,7 @@ public class BasicSkel extends Actor
                             poisoned = true;
                             stage.addActor(new IceBolt(screen.player.getX(), screen.player.getY(), getX()+16, getY()+16));
                             fireballSound.play(0.8f);
-                            
+                            poisonEffect.start();
                         }
                         
                     
@@ -344,11 +344,13 @@ public class BasicSkel extends Actor
    @Override
     public void act(float delta)
     {
-        poisonTimer -= delta;
+        if(health > 0 && health != 10000)
+            poisonTimer -= delta;
         if(poisoned && poisonTimer <= 0)
         {
             health -= screen.playerDamage * 0.3;
             poisonTimer = 0.3f;
+            poisonEffect.start();
         }
         if(slowTimer>0)
         {
@@ -373,13 +375,17 @@ public class BasicSkel extends Actor
             reset = false;
             slowTimer = -1;
         }
+        
         fireEffect.getEmitters().first().setPosition(getX()+45, getY()+32);
         iceEffect.getEmitters().first().setPosition(getX()+45, getY()+32);
+        poisonEffect.getEmitters().first().setPosition(getX()+45, getY()+32);
+        
         emptyHealthBar.setPosition(this.getX()+32, this.getY()+65);
         emptyHealthBar.setScale(1f, 0.65f);
         fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
         fullHealthBar.setOrigin(0f,0f);
-        fullHealthBar.setScale(health/NecromanticNuisance.playScreen.skelHealth, 0.7f);
+        if(health < NecromanticNuisance.playScreen.skelHealth)
+            fullHealthBar.setScale(health/NecromanticNuisance.playScreen.skelHealth, 0.7f);
         if((this.getX()==-100)&&(this.getY()==-100))
             this.remove();
         super.act(delta);
