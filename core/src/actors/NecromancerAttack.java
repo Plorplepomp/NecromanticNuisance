@@ -75,7 +75,7 @@ public class NecromancerAttack extends Actor
     @Override
     protected void positionChanged()
     {
-      sprite.setPosition(getX(), getY());
+      sprite.setPosition(getX(), getY()+40);
       super.positionChanged();
     }
         

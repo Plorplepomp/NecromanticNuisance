@@ -36,15 +36,16 @@ public class BasicSkel extends Actor
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10, init;
     public Sprite sprite, emptyHealthBar, fullHealthBar;
-    public float health, slowTimer;
+    public float health, slowTimer, poisonTimer;
     public float damage;
     public PlayScreen screen;
     float velocity;
     public SequenceAction kill;
     public Stage stage;
-    public ParticleEffect fireEffect, iceEffect;
+    public ParticleEffect fireEffect, iceEffect, poisonEffect;
     public Sound fireballSound;
     boolean slowed, reset;
+    public boolean poisoned;
     //public Rectangle body;
     
     public BasicSkel(float hlth, float dmg, float x, float y, Stage stg, PlayScreen scrn)
@@ -58,6 +59,7 @@ public class BasicSkel extends Actor
         slowTimer = -1;
         slowed = false;
         reset = false;
+        poisoned = false;
         if(damage < 220)
             texture = new Texture("skelsword1.png");
         if(damage < 240 && damage >= 220)
@@ -76,6 +78,10 @@ public class BasicSkel extends Actor
         iceEffect = new ParticleEffect();
         iceEffect.load(Gdx.files.internal("ice"), Gdx.files.internal(""));
         iceEffect.getEmitters().first().setPosition(getX(), getY());
+        
+        poisonEffect = new ParticleEffect();
+        poisonEffect.load(Gdx.files.internal("poison"), Gdx.files.internal(""));
+        poisonEffect.getEmitters().first().setPosition(getX(), getY());
         
         
         emptyHealthBar = new Sprite(new Texture("emptyBar.png"));
@@ -105,13 +111,22 @@ public class BasicSkel extends Actor
                         }
                         if(screen.playerSpell == 2)
                         {
-                            health -= screen.playerDamage;
+                            health -= screen.playerDamage*0.75;
                             stage.addActor(new IceBolt(screen.player.getX(), screen.player.getY(), getX()+16, getY()+16));
                             fireballSound.play(0.8f);
                             iceEffect.start();
                             slowTimer = 3;
-                            slowed = true;
+                            if(health >= 0)
+                                slowed = true;
                         }
+                        if(screen.playerSpell == 3)
+                        {
+                            poisoned = true;
+                            stage.addActor(new IceBolt(screen.player.getX(), screen.player.getY(), getX()+16, getY()+16));
+                            fireballSound.play(0.8f);
+                            
+                        }
+                        
                     
                     }
                     if(health <= 0)
@@ -265,7 +280,7 @@ public class BasicSkel extends Actor
         ma6.setDuration((375-185)/velocity);
         
         ma7 = new MoveToAction();
-        ma7.setPosition(-40f, 375f);
+        ma7.setPosition(-100f, 375f);
         ma7.setDuration((310+40)/velocity);
         
 
@@ -317,7 +332,7 @@ public class BasicSkel extends Actor
         }
         else if((y==375)&&(x<600))
         {
-            ma7.setDuration((x+40)/velocity);
+            ma7.setDuration((x+100)/velocity);
             SequenceAction sa9 = new SequenceAction(init, ma7);
             this.addAction(sa9);
         }
@@ -329,13 +344,19 @@ public class BasicSkel extends Actor
    @Override
     public void act(float delta)
     {
+        poisonTimer -= delta;
+        if(poisoned && poisonTimer <= 0)
+        {
+            health -= screen.playerDamage * 0.3;
+            poisonTimer = 0.3f;
+        }
         if(slowTimer>0)
         {
             slowTimer -= delta;
             if(slowTimer < 0)
                 slowTimer = 0;
         }
-        if(slowTimer == 0)
+        if(slowTimer == 0 && health >= 0)
             reset = true;            
         if(slowed)
         {
@@ -359,6 +380,8 @@ public class BasicSkel extends Actor
         fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
         fullHealthBar.setOrigin(0f,0f);
         fullHealthBar.setScale(health/NecromanticNuisance.playScreen.skelHealth, 0.7f);
+        if((this.getX()==-100)&&(this.getY()==-100))
+            this.remove();
         super.act(delta);
     }
 
@@ -369,6 +392,8 @@ public class BasicSkel extends Actor
         fireEffect.draw(batch);
         iceEffect.update(Gdx.graphics.getDeltaTime());
         iceEffect.draw(batch);
+        poisonEffect.update(Gdx.graphics.getDeltaTime());
+        poisonEffect.draw(batch);
         sprite.setColor(this.getColor());
         batch.setColor(this.getColor());
         sprite.draw(batch);

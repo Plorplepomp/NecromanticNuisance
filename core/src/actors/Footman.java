@@ -25,7 +25,7 @@ public class Footman extends Actor
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10;
     MoveToAction ma11, ma12, ma13, ma14, ma15, ma16, ma17, init;
     Sprite sprite, emptyHealthBar, fullHealthBar;
-    public boolean inCombat;
+    public boolean inCombat, notmoving;
     public float health;
     public float damage;
     float velocity;
@@ -35,6 +35,7 @@ public class Footman extends Actor
         this.setName("footman");
         damage = dmg;
         health = hlth;
+        notmoving = false;
         if(damage < 400)
             texture = new Texture("footman0.png");
         if(damage < 450 && damage >= 400)
@@ -167,7 +168,10 @@ public class Footman extends Actor
         emptyHealthBar.setScale(1f, 0.65f);
         fullHealthBar.setPosition(this.getX()+32, this.getY()+66);
         fullHealthBar.setOrigin(0f,0f);
-        fullHealthBar.setScale(health/NecromanticNuisance.playScreen.footHealth, 0.7f);
+        if(health<=NecromanticNuisance.playScreen.footHealth)
+            fullHealthBar.setScale(health/NecromanticNuisance.playScreen.footHealth, 0.7f);
+        if((this.getX()==-100)&&(this.getY()==-100))
+            this.remove();
         super.act(delta);
     }
    

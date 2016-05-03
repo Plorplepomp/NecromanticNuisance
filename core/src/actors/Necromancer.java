@@ -107,6 +107,7 @@ public class Necromancer extends Actor
         fullHealthBar.setOrigin(0f,0f);
         emptyHealthBar.setOrigin(0f,0f);
         fullHealthBar.setScale(3*health/20000, 0.7f);
+        attackTimer -= delta;
         super.act(delta);
     }
  
