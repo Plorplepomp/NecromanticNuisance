@@ -45,7 +45,7 @@ public class BasicSkel extends Actor
     public ParticleEffect fireEffect, iceEffect, poisonEffect;
     public Sound fireballSound;
     boolean slowed, reset;
-    public boolean poisoned;
+    public boolean poisoned, notmoving;
     //public Rectangle body;
     
     public BasicSkel(float hlth, float dmg, float x, float y, Stage stg, PlayScreen scrn)
@@ -60,6 +60,7 @@ public class BasicSkel extends Actor
         slowed = false;
         reset = false;
         poisoned = false;
+        notmoving = false;
         if(damage < 220)
             texture = new Texture("skelsword1.png");
         if(damage < 240 && damage >= 220)
@@ -130,7 +131,8 @@ public class BasicSkel extends Actor
                     
                     }
                     if(health <= 0)
-                    {                            
+                    { 
+                        poisoned = false;
                         setName("dead");
                         health = 100000;
                         clearActions();
@@ -348,7 +350,7 @@ public class BasicSkel extends Actor
             poisonTimer -= delta;
         if(poisoned && poisonTimer <= 0)
         {
-            health -= screen.playerDamage * 0.3;
+            health -= screen.playerDamage * 0.2;
             poisonTimer = 0.3f;
             poisonEffect.start();
         }

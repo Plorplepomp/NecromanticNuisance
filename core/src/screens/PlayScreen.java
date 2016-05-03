@@ -76,7 +76,7 @@ public class PlayScreen implements Screen
     boolean win, lose, loseLabel;
     public int gold, archerRange, playerSpell;
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth, archerSpeed;
-    public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage;
+    public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage, spreadTimer;
     static public Sound skeletonDeath;
     public Sound footmanDeath, dropSword, arrowShot, spellSound;
     public Music gameMusic;
@@ -151,6 +151,7 @@ public class PlayScreen implements Screen
         
         playerRange = 200;
         playerDamage = 50;
+        spreadTimer = 50;
         
         skeletonDeath = Gdx.audio.newSound(Gdx.files.internal("skeletondeath.wav"));
         footmanDeath = Gdx.audio.newSound(Gdx.files.internal("footmanDeath.wav"));
@@ -194,6 +195,7 @@ public class PlayScreen implements Screen
         TextButton button9 = new TextButton("  Select Poison Wave  ", textButtonStyle);
         TextButton button10 = new TextButton("  Increase Archer Damage 30g  ", textButtonStyle);
         TextButton button11 = new TextButton("  Increase Archer FireRate 30g", textButtonStyle);
+        TextButton button12 = new TextButton("  Increase Spell Damage 30g ", textButtonStyle);
         
         button1.addListener(new ChangeListener() 
         {
@@ -316,6 +318,32 @@ public class PlayScreen implements Screen
             }
         });
         
+        button11.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                if(gold >= 30)
+                {
+                    gold -= 30;
+                    archerSpeed += 0.1;
+                }
+            }
+        });
+        
+        button12.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                if(gold >= 30)
+                {
+                    gold -= 30;
+                    playerDamage += 5;
+                }
+            }
+        });
+        
         
         Label goldLabel = new Label("Gold: ", new Label.LabelStyle(font, BLACK));
         Label goldCount =  new Label(String.format("%03d", gold), new Label.LabelStyle(font, BLACK));
@@ -338,6 +366,8 @@ public class PlayScreen implements Screen
         table.add(button9).size(315f, 40f).colspan(2);
         table.row();
         table.add(button4).size(315f, 40f).colspan(2);
+        table.add(button11).size(315f, 40f).colspan(2);
+        table.add(button12).size(315f, 40f).colspan(2);
         table.setPosition(510f, 100f);
         stage.addActor(table);
         table.setName("table");
@@ -521,6 +551,7 @@ public class PlayScreen implements Screen
                         a.addAction(stopa);
                         b.addAction(stopb);
                         ((Footman) a).notmoving = true;
+                        ((BasicSkel) b).notmoving = true;
                         
                         ((Footman) a).health -= ((BasicSkel) b).damage * Gdx.graphics.getDeltaTime();
                         ((BasicSkel) b).health -= ((Footman) a).damage * Gdx.graphics.getDeltaTime();
@@ -555,6 +586,7 @@ public class PlayScreen implements Screen
                         a.addAction(stopa);
                         b.addAction(stopb);
                         ((Footman) b).notmoving = true;
+                        ((BasicSkel) a).notmoving = true;
 //                        a.addAction(stop);
 //                        b.addAction(stop);
                         ((BasicSkel) a).health -= ((Footman) b).damage * Gdx.graphics.getDeltaTime();
@@ -796,7 +828,7 @@ public class PlayScreen implements Screen
                         {
                             stage.addActor(new Arrow(a.getX(), a.getY(), b.getX(), b.getY()));
                             arrowShot.play(1.0f);
-                            ((Archer) a).arrowTimer = 3 - archerSPeed;
+                            ((Archer) a).arrowTimer = 3 - archerSpeed;
                             ((Necromancer) b).health -= archerDamage;
                             if(((Necromancer) b).health <= 0)
                             {
@@ -967,14 +999,19 @@ public class PlayScreen implements Screen
                     }
                 }
                 
-                 if((abs(a.getX()-b.getX())<100) && (abs(a.getY()-b.getY())<100)&&(a.getX()!=0))
+                spreadTimer -= delta;
+                 if((abs(a.getX()-b.getX())<130) && (abs(a.getY()-b.getY())<130)&&(a.getX()!=0))
                  {
-                     if (("skeleton".equals(b.getName())) && ("skeleton".equals(a.getName())))
+                     if(spreadTimer <= 0)
                      {
-                         if(((BasicSkel) a).poisoned)
-                             ((BasicSkel) b).poisoned = true;
-                         if(((BasicSkel) b).poisoned)
-                             ((BasicSkel) a).poisoned = true;
+                        if ("skeleton".equals(b.getName()) && "skeleton".equals(a.getName()))
+                        {
+                            if(((BasicSkel) a).poisoned)
+                                ((BasicSkel) b).poisoned = true;
+                            if(((BasicSkel) b).poisoned)
+                                 ((BasicSkel) a).poisoned = true;
+                            spreadTimer = 0.1f;
+                        }
                      }
                  }
                 
@@ -987,15 +1024,36 @@ public class PlayScreen implements Screen
                     len = stageActors.size;
                     archerMoveTimer = 80;
                 }
+                
                 footmanMoveTimer -= Gdx.graphics.getDeltaTime();
                 if("footman".equals(a.getName()) && ((Footman) a).notmoving && footmanMoveTimer <= 0)
                 {
                     stage.addActor(new Footman(((Footman) a).health, ((Footman) a).damage, ((Footman) a).getX(), ((Footman) a).getY()));
                     ((Footman) a).remove();
                     len = stageActors.size;
-                    footmanMoveTimer = 80;
+                    footmanMoveTimer = 500;
                 }
-            }
+                
+                if("skeleton".equals(a.getName()) && ((BasicSkel) a).notmoving && footmanMoveTimer <= 0)
+                {
+                    stage.addActor(new BasicSkel(((BasicSkel) a).health, ((BasicSkel) a).damage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
+                    ((BasicSkel) a).remove();
+                    len = stageActors.size;
+                    footmanMoveTimer = 500;
+                }
+                
+                if(("skeleton".equals(a.getName()) || "necromancer".equals(a.getName())) && abs(player.getX()-a.getX())<25 && abs(player.getY()-a.getY())<25)
+                {
+                    player.health -= skelDamage * delta;
+                    if(player.health <= 0)
+                        player.dead = true;
+                }
+                if("castle".equals(a.getName()) && (abs(player.getX()-a.getX())<30 && abs(player.getY()-a.getY())<30))
+                {
+                    if(player.health < 1000)
+                        player.health += 100*delta;
+                }
+            }               
         }
     }   
 
