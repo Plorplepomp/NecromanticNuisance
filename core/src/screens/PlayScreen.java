@@ -74,7 +74,7 @@ public class PlayScreen implements Screen
     private OrthogonalTiledMapRenderer renderer;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose, loseLabel;
-    public int gold, archerRange, playerSpell;
+    public int gold, archerRange, playerSpell, level;
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth, archerSpeed;
     public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage, spreadTimer;
     static public Sound skeletonDeath;
@@ -95,6 +95,8 @@ public class PlayScreen implements Screen
     public PlayScreen(NecromanticNuisance gm)
     {
         game = gm;
+        
+        level = 1;
         
         viewport = new ScreenViewport();
         
@@ -438,6 +440,19 @@ public class PlayScreen implements Screen
     
     public void update(float delta)
     {
+        // Level Management
+        
+        // Level 2
+        if(level == 2)
+        {
+            map = mapLoader.load("level2temp.tmx");
+            renderer = new OrthogonalTiledMapRenderer(map);
+            
+        }
+        	
+        
+        
+        
         red = new ColorAction();
         red.setEndColor(Color.RED);
         red.setDuration(1f);
