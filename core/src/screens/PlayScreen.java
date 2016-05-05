@@ -90,6 +90,8 @@ public class PlayScreen implements Screen
     public World world;
     private Box2DDebugRenderer b2dr;
     public PlayerCharacter player;
+    TextButton nextLevel;
+    Label won;
     NecromanticNuisance game;
     
     public PlayScreen(NecromanticNuisance gm)
@@ -198,6 +200,56 @@ public class PlayScreen implements Screen
         TextButton button10 = new TextButton("  Increase Archer Damage 30g  ", textButtonStyle);
         TextButton button11 = new TextButton("  Increase Archer FireRate 30g", textButtonStyle);
         TextButton button12 = new TextButton("  Increase Spell Damage 30g ", textButtonStyle);
+        
+        nextLevel = new TextButton("  Next Level  ", textButtonStyle);
+        
+        
+        TextButton cheat = new TextButton(" GOLD  ", textButtonStyle);
+        cheat.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                    gold += 100;
+            }
+        });
+        cheat.setPosition(100f, 600f);
+        stage.addActor(cheat);
+        
+        nextLevel.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                level++;
+                nextLevel.remove();
+                won.remove();
+                
+                Array<Actor> stageActors = stage.getActors();
+                int len = stageActors.size;
+                for(int j=0; j<5; j++)
+                {
+                    for(int i=0; i<len; i++)
+                    {
+                        Actor a = stageActors.get(i);
+                        if("skeleton".equals(a.getName()) || "footman".equals(a.getName())
+                                            || "castle".equals(a.getName())
+                                            || "archer".equals(a.getName())
+                                            || "necromancer".equals(a.getName())
+                                            || "dead".equals(a.getName()))
+                        a.remove();
+                        len = stageActors.size;
+                    }
+                }
+                
+                if(level == 2)
+                {
+                    map = mapLoader.load("level2.tmx");
+                    renderer = new OrthogonalTiledMapRenderer(map);                   
+                }
+            }
+        });
+        
         
         button1.addListener(new ChangeListener() 
         {
@@ -443,10 +495,9 @@ public class PlayScreen implements Screen
         // Level Management
         
         // Level 2
+        
         if(level == 2)
         {
-            map = mapLoader.load("level2temp.tmx");
-            renderer = new OrthogonalTiledMapRenderer(map);
             
         }
         	
@@ -511,9 +562,11 @@ public class PlayScreen implements Screen
             
         if(win == true)
         {
-            Label won = new Label("YOU WIN!", new Label.LabelStyle(font, BLACK));
-            won.setPosition(455f, 380f);                
+            won = new Label("YOU WIN!", new Label.LabelStyle(font, BLACK));
+            won.setPosition(455f, 380f);
+            nextLevel.setPosition(455f, 320f);
             stage.addActor(won);
+            stage.addActor(nextLevel);
             win = false;
         }
             
@@ -602,8 +655,6 @@ public class PlayScreen implements Screen
                         b.addAction(stopb);
                         ((Footman) b).notmoving = true;
                         ((BasicSkel) a).notmoving = true;
-//                        a.addAction(stop);
-//                        b.addAction(stop);
                         ((BasicSkel) a).health -= ((Footman) b).damage * Gdx.graphics.getDeltaTime();
                         ((Footman) b).health -= ((BasicSkel) a).damage * Gdx.graphics.getDeltaTime();
                         if(((BasicSkel) a).health <= 0)
@@ -853,6 +904,7 @@ public class PlayScreen implements Screen
                                 b.addAction(kill);
                                 skeletonDeath.play(1.0f);
                                 gold += 50;
+                                win = true;
                             }
                         }
                         
@@ -876,6 +928,7 @@ public class PlayScreen implements Screen
                                 a.addAction(kill);
                                 skeletonDeath.play(1.0f);
                                 gold += 50;
+                                win = true;
                             }
                         }
                     }
