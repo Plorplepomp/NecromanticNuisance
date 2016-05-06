@@ -74,7 +74,7 @@ public class PlayScreen implements Screen
     private OrthogonalTiledMapRenderer renderer;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose, loseLabel;
-    public int gold, archerRange, playerSpell, level;
+    public int gold, archerRange, playerSpell, level, skelPath, footPath;
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth, archerSpeed;
     public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage, spreadTimer;
     static public Sound skeletonDeath;
@@ -138,6 +138,8 @@ public class PlayScreen implements Screen
         difficulty = 0;
         gold = 0;
         lives = 10;
+        skelPath = 1;
+        footPath = 1;
         win = false;
         lose = false;
         loseLabel = false;
@@ -167,7 +169,7 @@ public class PlayScreen implements Screen
         
         stage = new Stage(viewport);
         
-        stage.addActor(new Necromancer(20000, skelDamage, stage));
+        stage.addActor(new Necromancer(20000, skelDamage, 940f, 375f, stage));
         
         red = new ColorAction();
         red.setEndColor(Color.RED);
@@ -245,7 +247,29 @@ public class PlayScreen implements Screen
                 if(level == 2)
                 {
                     map = mapLoader.load("level2.tmx");
-                    renderer = new OrthogonalTiledMapRenderer(map);                   
+                    renderer = new OrthogonalTiledMapRenderer(map);
+                    
+                    BodyDef bdef = new BodyDef();
+                    PolygonShape shape = new PolygonShape();
+                    FixtureDef fdef = new FixtureDef();
+                    Body body;
+                    for(MapObject object : map.getLayers().get(3).getObjects().getByType(RectangleMapObject.class))
+                    {
+                        Rectangle rect = ((RectangleMapObject) object).getRectangle();
+                        bdef.type = BodyDef.BodyType.StaticBody;
+                        bdef.position.set(rect.getX() + rect.getWidth()/2, rect.getY() + rect.getHeight()/2);
+                        body = world.createBody(bdef);
+                        shape.setAsBox(rect.getWidth()/2, rect.getHeight()/2);
+                        fdef.shape = shape;
+                        body.createFixture(fdef);
+                    }
+
+                    
+                    player.setPosition(35f, 450f);
+                    stage.addActor(new Castle(20000, 400, 35f, 450f, stage));
+                    stage.addActor(new Necromancer(40000, skelDamage, 940f, 550f, stage));
+                    stage.addActor(new Necromancer(40000, skelDamage, 940f, 340f, stage));
+                    
                 }
             }
         });
@@ -301,7 +325,7 @@ public class PlayScreen implements Screen
                 if(gold >= 50)
                 {
                     gold -= 50;
-                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 375));
+                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 375, level, 1));
                 }
             }
         });        
@@ -527,24 +551,39 @@ public class PlayScreen implements Screen
         {
             skelDamage = 160 + difficulty;
             if(win==false)
-                stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 375f, stage, this));
+                if(level == 1)
+                    stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 375f, level, skelPath, stage, this));
+                if(level == 2)
+                {
+                    stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 550f, level, 1, stage, this));
+                    stage.addActor(new BasicSkel(skelHealth, skelDamage, 900f, 350f, level, 2, stage, this));
+                }
             if(difficulty < 110)
                 spawnTimer = 200 - difficulty;
             else spawnTimer = 90;
-            difficulty += 2;
+            difficulty += 1;
+//            if(skelPath == 1)
+//                skelPath = 2;
+//            else if(skelPath == 2)
+//                skelPath = 1;
+            
         }
         
         if(recruitTimer == 0)
         {
             if(!castleSpawned)
             {
-                stage.addActor(new Castle(20000, 400, stage));
+                stage.addActor(new Castle(20000, 400, 35f, 370f, stage));
                 castleSpawned = true;
             }    
             if(lose==false)
             {
-                stage.addActor(new Footman(footHealth, footDamage, 100f, 375f));
+                stage.addActor(new Footman(footHealth, footDamage, 100f, 375f, level, footPath));
                 recruitTimer = 400 - recruitReset;
+                if(footPath == 1)
+                    footPath = 2;
+                if(footPath == 2)
+                    footPath = 1;
             }
         }
         
@@ -631,7 +670,7 @@ public class PlayScreen implements Screen
                             a.addAction(kill);
                             footmanDeath.play(0.7f);
                             dropSword.play(0.7f);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), level, ((BasicSkel) b).path, stage, this));
                             ((BasicSkel) b).remove();
                         }
                         if(((BasicSkel) b).health <= 0)
@@ -642,7 +681,7 @@ public class PlayScreen implements Screen
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
-                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY()));
+                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY(), level, ((Footman) a).path));
                             ((Footman) a).remove();
 
                         }
@@ -665,7 +704,7 @@ public class PlayScreen implements Screen
                             a.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 5;
-                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY()));
+                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY(), level, ((Footman) b).path));
                             ((Footman) b).remove();
                         }
                         if(((Footman) b).health <= 0)
@@ -676,7 +715,7 @@ public class PlayScreen implements Screen
                             b.addAction(kill);
                             footmanDeath.play(0.7f);
                             dropSword.play(0.7f);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), level, ((BasicSkel) a).path, stage, this));
                             ((BasicSkel) a).remove();
                         }
                         
@@ -700,7 +739,7 @@ public class PlayScreen implements Screen
                             a.clearActions();
                             a.addAction(kill);
                             footmanDeath.play(0.7f);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), level, ((BasicSkel) b).path, stage, this));
                             ((BasicSkel) b).remove();
                         }
                     }
@@ -718,7 +757,7 @@ public class PlayScreen implements Screen
                             b.clearActions();
                             b.addAction(kill);
                             footmanDeath.play(0.7f);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), level, ((BasicSkel) a).path, stage, this));
                             ((BasicSkel) a).remove();
                         }
                     }
@@ -749,7 +788,7 @@ public class PlayScreen implements Screen
                             b.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 50;
-                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY()));
+                            stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY(), level, ((Footman) a).path));
                             ((Footman) a).remove();
                             win = true;
                         }
@@ -767,7 +806,7 @@ public class PlayScreen implements Screen
                             a.addAction(kill);
                             skeletonDeath.play(1.0f);
                             gold += 50;
-                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY()));
+                            stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY(), level, ((Footman) b).path));
                             ((Footman) b).remove();
                             win = true;
                         }
@@ -797,7 +836,7 @@ public class PlayScreen implements Screen
                             ((Castle) b).health = 100000;
                             b.clearActions();
                             b.addAction(kill);
-                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) a).health, skelDamage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), level, ((BasicSkel) a).path, stage, this));
                             ((BasicSkel) a).remove();
                             lose = true;
                         }
@@ -812,7 +851,7 @@ public class PlayScreen implements Screen
                             ((Castle) a).health = 100000;
                             a.clearActions();
                             a.addAction(kill);
-                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), stage, this));
+                            stage.addActor(new BasicSkel(((BasicSkel) b).health, skelDamage, ((BasicSkel) b).getX(), ((BasicSkel) b).getY(), level, ((BasicSkel) b).path, stage, this));
                             ((BasicSkel) b).remove();
                             lose = true;
                         }
@@ -1096,7 +1135,7 @@ public class PlayScreen implements Screen
                 footmanMoveTimer -= Gdx.graphics.getDeltaTime();
                 if("footman".equals(a.getName()) && ((Footman) a).notmoving && footmanMoveTimer <= 0)
                 {
-                    stage.addActor(new Footman(((Footman) a).health, ((Footman) a).damage, ((Footman) a).getX(), ((Footman) a).getY()));
+                    stage.addActor(new Footman(((Footman) a).health, ((Footman) a).damage, ((Footman) a).getX(), ((Footman) a).getY(), level, ((Footman) a).path));
                     ((Footman) a).remove();
                     len = stageActors.size;
                     footmanMoveTimer = 500;
@@ -1104,7 +1143,7 @@ public class PlayScreen implements Screen
                 
                 if("skeleton".equals(a.getName()) && ((BasicSkel) a).notmoving && footmanMoveTimer <= 0)
                 {
-                    stage.addActor(new BasicSkel(((BasicSkel) a).health, ((BasicSkel) a).damage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), stage, this));
+                    stage.addActor(new BasicSkel(((BasicSkel) a).health, ((BasicSkel) a).damage, ((BasicSkel) a).getX(), ((BasicSkel) a).getY(), level, ((BasicSkel) a).path, stage, this));
                     ((BasicSkel) a).remove();
                     len = stageActors.size;
                     footmanMoveTimer = 500;

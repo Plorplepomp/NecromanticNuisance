@@ -35,6 +35,7 @@ public class BasicSkel extends Actor
 {
     Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10, init;
+    SequenceAction sa1, sa2, sa3, sa4, csa;
     public Sprite sprite, emptyHealthBar, fullHealthBar;
     public float health, slowTimer, poisonTimer;
     public float damage;
@@ -46,12 +47,16 @@ public class BasicSkel extends Actor
     public Sound fireballSound;
     boolean slowed, reset;
     public boolean poisoned, notmoving;
+    int level;
+    public int path;
     //public Rectangle body;
     
-    public BasicSkel(float hlth, float dmg, float x, float y, Stage stg, PlayScreen scrn)
+    public BasicSkel(float hlth, float dmg, float x, float y, int lvl, int pth, Stage stg, PlayScreen scrn)
     {
         
         this.setName("skeleton");
+        level = lvl;
+        path = pth;
         stage = stg;
         screen = scrn;
         health = hlth;
@@ -150,193 +155,254 @@ public class BasicSkel extends Actor
         
         assignMovement(x, y);
         
-        /*
-        init = new MoveToAction();
-        init.setPosition(x, y);
-        
-        ms = new MoveToAction();
-        ms.setPosition(900f,375f);
-        
-        ma1 = new MoveToAction();
-        ma1.setPosition(680f,375f);
-        ma1.setDuration((900-680)/velocity);
-        
-        ma2 = new MoveToAction();
-        ma2.setPosition(680f, 575f);
-        ma2.setDuration((575-375)/velocity);
-        
-        ma3 = new MoveToAction();
-        ma3.setPosition(505f, 575f);
-        ma3.setDuration((680-505)/velocity);
-        
-        ma4 = new MoveToAction();
-        ma4.setPosition(505f, 185f);
-        ma4.setDuration((575-185)/velocity);
-        
-        ma5 = new MoveToAction();
-        ma5.setPosition(310f, 185f);
-        ma5.setDuration((505-310)/velocity);
-        
-        ma6 = new MoveToAction();
-        ma6.setPosition(310f, 375f);
-        ma6.setDuration((375-185)/velocity);
-        
-        ma7 = new MoveToAction();
-        ma7.setPosition(-40f, 375f);
-        ma7.setDuration((310+40)/velocity);
-        
-
-        SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
-        SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
-        SequenceAction sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
-        SequenceAction csa = new SequenceAction(sa1, sa2);
-        
-        if((x==900)&&(y==375))
-            this.addAction(csa);
-        else if((y==375)&&(x>680))
-        {
-            ma1.setDuration((x-680)/velocity);
-            sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
-            SequenceAction csa1 = new SequenceAction(sa3, sa2);
-            this.addAction(csa1);
-        }
-        else if((x==680)&&(y!=575))
-        {
-            ma2.setDuration((575-y)/velocity);
-            SequenceAction sa4 = new SequenceAction(init, ma2, ma3, ma4);
-            SequenceAction csa4 = new SequenceAction(sa4, sa2);
-            this.addAction(csa4);
-        }
-        else if((y==575)&&(x!=505))
-        {
-            ma3.setDuration((x-505)/velocity);
-            SequenceAction sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
-            SequenceAction csa5 = new SequenceAction(init, sa5);
-            this.addAction(csa5);
-        }
-        else if((x==505)&&(y!=185))
-        {
-            ma4.setDuration((y-185)/velocity);
-            SequenceAction sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
-            this.addAction(sa6);
-        }
-        else if((y==185)&&(x!=310))
-        {
-            ma5.setDuration((x-310)/velocity);
-            SequenceAction sa7 = new SequenceAction(init, ma5, ma6, ma7);
-            this.addAction(sa7);
-        }
-        else if((x==310)&&(y!=375))
-        {    
-            ma6.setDuration((375-y)/velocity);
-            SequenceAction sa8 = new SequenceAction(init, ma6, ma7);
-            this.addAction(sa8);
-        }
-        else if((y==375)&&(x<600))
-        {
-            ma7.setDuration((x+40)/velocity);
-            SequenceAction sa9 = new SequenceAction(init, ma7);
-            this.addAction(sa9);
-        }
-        
-        /*      
-        int len = stage.size;
-        for(i=0; i<len; i++){
-        Actor a = stageActors.get(i);
-        if(a.getName().equals("myactor")){s
-        //a is your Actor!
-        break;
-    */
     }
 
     public void assignMovement(float x, float y)
     {
-         init = new MoveToAction();
+        init = new MoveToAction();
         init.setPosition(x, y);
-        
-        ms = new MoveToAction();
-        ms.setPosition(900f,375f);
-        
         ma1 = new MoveToAction();
-        ma1.setPosition(680f,375f);
-        ma1.setDuration((900-680)/velocity);
-        
         ma2 = new MoveToAction();
-        ma2.setPosition(680f, 575f);
-        ma2.setDuration((575-375)/velocity);
-        
         ma3 = new MoveToAction();
-        ma3.setPosition(505f, 575f);
-        ma3.setDuration((680-505)/velocity);
-        
         ma4 = new MoveToAction();
-        ma4.setPosition(505f, 185f);
-        ma4.setDuration((575-185)/velocity);
-        
         ma5 = new MoveToAction();
-        ma5.setPosition(310f, 185f);
-        ma5.setDuration((505-310)/velocity);
-        
         ma6 = new MoveToAction();
-        ma6.setPosition(310f, 375f);
-        ma6.setDuration((375-185)/velocity);
-        
         ma7 = new MoveToAction();
-        ma7.setPosition(-100f, 375f);
-        ma7.setDuration((310+40)/velocity);
         
+        if(level == 1)
+        {
+            ms = new MoveToAction();
+            ms.setPosition(900f,375f);
+        
+            ma1.setPosition(680f,375f);
+            ma1.setDuration((900-680)/velocity);
+        
+            ma2.setPosition(680f, 575f);
+            ma2.setDuration((575-375)/velocity);
+        
+            ma3.setPosition(505f, 575f);
+            ma3.setDuration((680-505)/velocity);
+        
+            ma4.setPosition(505f, 185f);
+            ma4.setDuration((575-185)/velocity);
+            
+            ma5.setPosition(310f, 185f);
+            ma5.setDuration((505-310)/velocity);
 
-        SequenceAction sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
-        SequenceAction sa2 = new SequenceAction(ma5, ma6, ma7);
-        SequenceAction sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
-        SequenceAction csa = new SequenceAction(sa1, sa2);
+            ma6.setPosition(310f, 375f);
+            ma6.setDuration((375-185)/velocity);
         
-        if((x==900)&&(y==375))
-            this.addAction(csa);
-        else if((y==375)&&(x>680))
-        {
-            ma1.setDuration((x-680)/velocity);
+            ma7.setPosition(-100f, 375f);
+            ma7.setDuration((310+40)/velocity);
+        
+        
+            sa1 = new SequenceAction(ms, ma1, ma2, ma3, ma4);
+            sa2 = new SequenceAction(ma5, ma6, ma7);
             sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
-            SequenceAction csa1 = new SequenceAction(sa3, sa2);
-            this.addAction(csa1);
+            csa = new SequenceAction(sa1, sa2);
+        
+            if((x==900)&&(y==375))
+                this.addAction(csa);
+            else if((y==375)&&(x>680))
+            {
+                ma1.setDuration((x-680)/velocity);
+                sa3 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                SequenceAction csa1 = new SequenceAction(sa3, sa2);
+                this.addAction(csa1);
+            }
+            else if((x==680)&&(y!=575))
+            {
+                ma2.setDuration((575-y)/velocity);
+                SequenceAction sa4 = new SequenceAction(init, ma2, ma3, ma4);
+                SequenceAction csa4 = new SequenceAction(sa4, sa2);
+                this.addAction(csa4);
+            }
+            else if((y==575)&&(x!=505))
+            {
+                ma3.setDuration((x-505)/velocity);
+                SequenceAction sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
+                SequenceAction csa5 = new SequenceAction(init, sa5);
+                this.addAction(csa5);
+            }
+            else if((x==505)&&(y!=185))
+            {
+                ma4.setDuration((y-185)/velocity);
+                SequenceAction sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
+                this.addAction(sa6);
+            }
+            else if((y==185)&&(x!=310))
+            {   
+                ma5.setDuration((x-310)/velocity);
+                SequenceAction sa7 = new SequenceAction(init, ma5, ma6, ma7);
+                this.addAction(sa7);
+            }
+            else if((x==310)&&(y!=375))
+            {    
+                ma6.setDuration((375-y)/velocity);
+                SequenceAction sa8 = new SequenceAction(init, ma6, ma7);
+                this.addAction(sa8);
+            }
+            else if((y==375)&&(x<600))
+            {
+                ma7.setDuration((x+100)/velocity);
+                SequenceAction sa9 = new SequenceAction(init, ma7);
+                this.addAction(sa9);
+            }
         }
-        else if((x==680)&&(y!=575))
+        if(level == 2)
         {
-            ma2.setDuration((575-y)/velocity);
-            SequenceAction sa4 = new SequenceAction(init, ma2, ma3, ma4);
-            SequenceAction csa4 = new SequenceAction(sa4, sa2);
-            this.addAction(csa4);
-        }
-        else if((y==575)&&(x!=505))
-        {
-            ma3.setDuration((x-505)/velocity);
-            SequenceAction sa5 = new SequenceAction(ma3, ma4, ma5, ma6, ma7);
-            SequenceAction csa5 = new SequenceAction(init, sa5);
-            this.addAction(csa5);
-        }
-        else if((x==505)&&(y!=185))
-        {
-            ma4.setDuration((y-185)/velocity);
-            SequenceAction sa6 = new SequenceAction(init, ma4, ma5, ma6, ma7);
-            this.addAction(sa6);
-        }
-        else if((y==185)&&(x!=310))
-        {
-            ma5.setDuration((x-310)/velocity);
-            SequenceAction sa7 = new SequenceAction(init, ma5, ma6, ma7);
-            this.addAction(sa7);
-        }
-        else if((x==310)&&(y!=375))
-        {    
-            ma6.setDuration((375-y)/velocity);
-            SequenceAction sa8 = new SequenceAction(init, ma6, ma7);
-            this.addAction(sa8);
-        }
-        else if((y==375)&&(x<600))
-        {
-            ma7.setDuration((x+100)/velocity);
-            SequenceAction sa9 = new SequenceAction(init, ma7);
-            this.addAction(sa9);
+            if(path == 1)
+            {
+                ma1.setPosition(550f, 550f);
+                ma1.setDuration((900-550)/velocity);
+                
+                ma2.setPosition(550f, 640f);
+                ma2.setDuration((640-550)/velocity);
+                
+                ma3.setPosition(350f, 640f);
+                ma3.setDuration((550-350)/velocity);
+                
+                ma4.setPosition(350f, 590f);
+                ma4.setDuration((650-590)/velocity);
+                
+                ma5.setPosition(225f, 590f);
+                ma5.setDuration((350-225)/velocity);
+                
+                ma6.setPosition(225f, 460f);
+                ma6.setDuration((590-460f)/velocity);
+                
+                ma7.setPosition(-100f, 460f);
+                ma7.setDuration((225+100)/velocity);
+                
+                if(x == 900 && y == 550)
+                {
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x < 900 && y == 550)
+                {
+                    ma1.setDuration((x-550)/velocity);
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 550 && y < 640)
+                {
+                    ma2.setDuration((640-y)/velocity);
+                    sa1 = new SequenceAction(init, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x < 550 && y == 640)
+                {
+                    ma3.setDuration((x-550)/velocity);
+                    sa1 = new SequenceAction(init, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 350 && y > 590)
+                {
+                    ma4.setDuration((y-590)/velocity);
+                    sa1 = new SequenceAction(init, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x > 225 && y == 590)
+                {
+                    ma5.setDuration((x-225)/velocity);
+                    sa2 = new SequenceAction(init, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 225 && y > 460)
+                {
+                    ma6.setDuration((y-460)/velocity);
+                    sa2 = new SequenceAction(init, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x > -100 && y == 460)
+                {
+                    ma7.setDuration((x+100)/velocity);
+                    sa2 = new SequenceAction(init, ma7);
+                    addAction(sa2);
+                }
+            }
+            if(path == 2)
+            {
+                ma1.setPosition(550f, 350f);
+                ma1.setDuration((900-550)/velocity);
+                
+                ma2.setPosition(550f, 250f);
+                ma2.setDuration((350-250)/velocity);
+                
+                ma3.setPosition(350f, 250f);
+                ma3.setDuration((550-350)/velocity);
+                
+                ma4.setPosition(350f, 310f);
+                ma4.setDuration((310-250)/velocity);
+                
+                ma5.setPosition(225f, 310f);
+                ma5.setDuration((350-225)/velocity);
+                
+                ma6.setPosition(225f, 435f);
+                ma6.setDuration((435-310)/velocity);
+                
+                ma7.setPosition(-100f, 435f);
+                ma7.setDuration((225+100)/velocity);
+                
+                if(x == 900 && y == 350)
+                {
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x < 900 && y == 350)
+                {
+                    ma1.setDuration((x-550)/velocity);
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 550 && y > 250)
+                {
+                    ma2.setDuration((y-250)/velocity);
+                    sa1 = new SequenceAction(init, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x > 350 && y == 250)
+                {
+                    ma3.setDuration((x-350)/velocity);
+                    sa1 = new SequenceAction(init, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 350 && y < 310)
+                {
+                    ma4.setDuration((310-y)/velocity);
+                    sa1 = new SequenceAction(init, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x > 225 && y == 310)
+                {
+                    ma5.setDuration((x-225)/velocity);
+                    sa2 = new SequenceAction(init, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x == 225 && y < 435)
+                {
+                    ma6.setDuration((435-y)/velocity);
+                    sa2 = new SequenceAction(init, ma6, ma7);
+                    addAction(sa2);
+                }
+                if(x > -100 && y == 435)
+                {
+                    ma7.setDuration((x+100)/velocity);
+                    sa2 = new SequenceAction(init, ma7);
+                    addAction(sa2);
+                }
+            }
         }
     }
     
@@ -414,15 +480,6 @@ public class BasicSkel extends Actor
     protected void positionChanged()
     {
       sprite.setPosition(getX(), getY());
-      /*
-      body.x = getX();
-      body.y = getY();
-      body.height = getHeight();
-      body.width = getWidth();
-      super.positionChanged();
-      
-    //  Array<Actor> stageActors = stage.getActors();
-      */
     }
     
 }
