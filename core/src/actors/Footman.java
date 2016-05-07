@@ -29,12 +29,16 @@ public class Footman extends Actor
     public float health;
     public float damage;
     float velocity;
+    int level;
+    public int path;
     
-    public Footman(float hlth, float dmg,  float x, float y)
+    public Footman(float hlth, float dmg,  float x, float y, int lvl, int pth)
     {
         this.setName("footman");
         damage = dmg;
         health = hlth;
+        level = lvl;
+        path = pth;
         notmoving = false;
         if(damage < 400)
             texture = new Texture("footman0.png");

@@ -27,7 +27,7 @@ public class Castle extends Actor
     public float health, arrowTimer;
     float velocity;
     
-    public Castle(float hlth, float damage, Stage stage)
+    public Castle(float hlth, float damage,  float x, float y, Stage stage)
     {
         this.setName("castle");
         texture = new Texture("castle.png");
@@ -43,7 +43,8 @@ public class Castle extends Actor
         velocity = 70;
 
         ms = new MoveToAction();
-        ms.setPosition(35f,370f);
+        ms.setPosition(x, y);
+//        ms.setPosition(35f,370f);
         
         Castle.this.addAction(ms);
 
