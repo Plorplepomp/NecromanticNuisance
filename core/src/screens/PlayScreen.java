@@ -581,13 +581,15 @@ public class PlayScreen implements Screen
                 castleSpawned = true;
             }    
             if(lose==false)
-            {
-                stage.addActor(new Footman(footHealth, footDamage, 100f, 375f, level, footPath));
+            {   
+                if(level == 1)
+                    stage.addActor(new Footman(footHealth, footDamage, 100f, 375f, level, footPath));
+                if(level == 2)
+                {
+                    stage.addActor(new Footman(footHealth, footDamage, 100f, 460f, level, 1));
+                    stage.addActor(new Footman(footHealth, footDamage, 100f, 435f, level, 2));
+                }
                 recruitTimer = 400 - recruitReset;
-                if(footPath == 1)
-                    footPath = 2;
-                if(footPath == 2)
-                    footPath = 1;
             }
         }
         
