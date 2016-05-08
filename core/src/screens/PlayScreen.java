@@ -226,7 +226,7 @@ public class PlayScreen implements Screen
                 level++;
                 nextLevel.remove();
                 won.remove();
-                
+//                world.
                 Array<Actor> stageActors = stage.getActors();
                 int len = stageActors.size;
                 for(int j=0; j<5; j++)
@@ -248,6 +248,11 @@ public class PlayScreen implements Screen
                 {
                     map = mapLoader.load("level2.tmx");
                     renderer = new OrthogonalTiledMapRenderer(map);
+                    player.setPosition(35, 400);
+                    
+                    Array<Body> bodies;
+                    
+//                    world.getBodies(bodies);
                     
                     BodyDef bdef = new BodyDef();
                     PolygonShape shape = new PolygonShape();
@@ -265,7 +270,6 @@ public class PlayScreen implements Screen
                     }
 
                     
-                    player.setPosition(35f, 450f);
                     stage.addActor(new Castle(20000, 400, 35f, 450f, stage));
                     stage.addActor(new Necromancer(40000, skelDamage, 940f, 550f, stage));
                     stage.addActor(new Necromancer(40000, skelDamage, 940f, 340f, stage));
