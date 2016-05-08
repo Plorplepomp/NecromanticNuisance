@@ -33,14 +33,14 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
  */
 public class BasicSkel extends Actor
 {
-    Texture texture;
+    public Texture texture;
     MoveToAction ms, ma1, ma2, ma3, ma4, ma5, ma6, ma7, ma8, ma9, ma10, init;
     SequenceAction sa1, sa2, sa3, sa4, csa;
     public Sprite sprite, emptyHealthBar, fullHealthBar;
     public float health, slowTimer, poisonTimer;
     public float damage;
     public PlayScreen screen;
-    float velocity;
+    public float velocity;
     public SequenceAction kill;
     public Stage stage;
     public ParticleEffect fireEffect, iceEffect, poisonEffect;
