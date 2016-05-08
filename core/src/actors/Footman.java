@@ -186,6 +186,7 @@ public class Footman extends Actor
     {
         init = new MoveToAction();
         init.setPosition(x, y);
+        
         ma1 = new MoveToAction();
         ma2 = new MoveToAction();
         ma3 = new MoveToAction();
@@ -306,49 +307,128 @@ public class Footman extends Actor
                     sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x > 100 && y == 460)
+                else if(x > 100 && y == 460)
                 {
                     ma1.setDuration((225-x)/velocity);
                     sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
                     sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x == 225 && y < 590)
+                else if(x == 225 && y < 590)
                 {
                     ma2.setDuration((590-y)/velocity);
                     sa1 = new SequenceAction(init, ma2, ma3, ma4);
                     sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x < 350 && y == 590)
+                else if(x < 350 && y == 590)
                 {
                     ma3.setDuration((350-x)/velocity);
                     sa1 = new SequenceAction(init, ma3, ma4);
                     sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x == 350 && y < 640)
+                else if(x == 350 && y < 640)
                 {
                     ma4.setDuration((640-y)/velocity);
                     sa1 = new SequenceAction(init, ma4);
                     sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x > 225 && y == 590)
+                else if(x < 550 && y == 640)
                 {
-                    ma5.setDuration((x-225)/velocity);
+                    ma5.setDuration((550-x)/velocity);
                     sa2 = new SequenceAction(init, ma5, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x == 225 && y > 460)
+                else if(x == 550 && y > 550)
                 {
-                    ma6.setDuration((y-460)/velocity);
+                    ma6.setDuration((y-550)/velocity);
                     sa2 = new SequenceAction(init, ma6, ma7);
                     addAction(sa2);
                 }
-                if(x > -100 && y == 460)
+                else if(x < 1100 && y == 550)
                 {
-                    ma7.setDuration((x+100)/velocity);
+                    ma7.setDuration((1100-x)/velocity);
+                    sa2 = new SequenceAction(init, ma7);
+                    addAction(sa2);
+                }
+            }
+            else if(path == 2)
+            {
+                
+                ma1.setPosition(225f, 435f);
+                ma1.setDuration((225-100)/velocity);
+                
+                ma2.setPosition(225f, 310f);
+                ma2.setDuration((435-310)/velocity);
+                
+                ma3.setPosition(350f, 310f);
+                ma3.setDuration((350-225)/velocity);
+                
+                ma4.setPosition(350f, 250f);
+                ma4.setDuration((310-250)/velocity);
+                
+                ma5.setPosition(550f, 250f);
+                ma5.setDuration((550-350)/velocity);
+                
+                ma6.setPosition(550f, 350f);
+                ma6.setDuration((350-250)/velocity);
+                
+                ma7.setPosition(1100f, 350f);
+                ma7.setDuration((1100-550)/velocity);
+                
+                SequenceAction sa1, sa2;
+                
+                if(x == 100 && y == 435)
+                {
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x < 225 && y == 435)
+                {
+                    ma1.setDuration((225-x)/velocity);
+                    sa1 = new SequenceAction(init, ma1, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x == 225 && y > 310)
+                {
+                    ma2.setDuration((y-310)/velocity);
+                    sa1 = new SequenceAction(init, ma2, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x < 350 && y == 310)
+                {
+                    ma3.setDuration((350-x)/velocity);
+                    sa1 = new SequenceAction(init, ma3, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x == 350 && y > 250)
+                {
+                    ma4.setDuration((y-250)/velocity);
+                    sa1 = new SequenceAction(init, ma4);
+                    sa2 = new SequenceAction(sa1, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x < 550 && y == 250)
+                {
+                    ma5.setDuration((550-x)/velocity);
+                    sa2 = new SequenceAction(init, ma5, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x == 550 && y < 350)
+                {
+                    ma6.setDuration((350-y)/velocity);
+                    sa2 = new SequenceAction(init, ma6, ma7);
+                    addAction(sa2);
+                }
+                else if(x < 1100 && y == 350)
+                {
+                    ma7.setDuration((1100-x)/velocity);
                     sa2 = new SequenceAction(init, ma7);
                     addAction(sa2);
                 }

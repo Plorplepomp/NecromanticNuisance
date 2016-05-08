@@ -74,7 +74,7 @@ public class PlayScreen implements Screen
     private OrthogonalTiledMapRenderer renderer;
     int spawnTimer, recruitTimer, difficulty, recruitReset, lives;
     boolean win, lose, loseLabel;
-    public int gold, archerRange, playerSpell, level, skelPath, footPath;
+    public int gold, archerRange, playerSpell, level, skelPath, footPath, necromancerCount;
     public float footHealth, footDamage, skelHealth, skelDamage, currentFootHealth, currentSkelHealth, archerSpeed;
     public float archerHealth, archerDamage, archerMoveTimer, footmanMoveTimer, playerRange, playerDamage, spreadTimer;
     static public Sound skeletonDeath;
@@ -90,7 +90,7 @@ public class PlayScreen implements Screen
     public World world;
     private Box2DDebugRenderer b2dr;
     public PlayerCharacter player;
-    TextButton nextLevel;
+    TextButton nextLevel, topPath, bottomPath;
     Label won;
     NecromanticNuisance game;
     
@@ -99,13 +99,14 @@ public class PlayScreen implements Screen
         game = gm;
         
         level = 1;
+        necromancerCount = 1;
         
         viewport = new ScreenViewport();
         
         world = new World(new Vector2(0, 0), true);
         b2dr = new Box2DDebugRenderer();
         
-        player = new PlayerCharacter(world);
+        player = new PlayerCharacter(world, 100f, 400f);
         playerSpell = 1;
         
         mapLoader = new TmxMapLoader();
@@ -166,6 +167,7 @@ public class PlayScreen implements Screen
         spellSound = Gdx.audio.newSound(Gdx.files.internal("fireball.wav"));
         gameMusic = Gdx.audio.newMusic(Gdx.files.internal("curseofthescarab.mp3"));
         gameMusic.play();
+        gameMusic.setLooping(true);
         
         stage = new Stage(viewport);
         
@@ -205,6 +207,11 @@ public class PlayScreen implements Screen
         
         nextLevel = new TextButton("  Next Level  ", textButtonStyle);
         
+        bottomPath = new TextButton(" Send Trained Units Down  ", textButtonStyle);
+        bottomPath.setPosition(50f, 300f);
+        topPath = new TextButton(" Send Trained Units Up  ", textButtonStyle);
+        topPath.setPosition(50f, 600f);
+        
         
         TextButton cheat = new TextButton(" GOLD  ", textButtonStyle);
         cheat.addListener(new ChangeListener() 
@@ -224,9 +231,9 @@ public class PlayScreen implements Screen
             public void changed (ChangeListener.ChangeEvent event, Actor actor) 
             {
                 level++;
+                necromancerCount = level;
                 nextLevel.remove();
                 won.remove();
-//                world.
                 Array<Actor> stageActors = stage.getActors();
                 int len = stageActors.size;
                 for(int j=0; j<5; j++)
@@ -248,11 +255,9 @@ public class PlayScreen implements Screen
                 {
                     map = mapLoader.load("level2.tmx");
                     renderer = new OrthogonalTiledMapRenderer(map);
-                    player.setPosition(35, 400);
                     
-                    Array<Body> bodies;
-                    
-//                    world.getBodies(bodies);
+                    world = new World(new Vector2(0, 0), true);
+                    player = new PlayerCharacter(world, 100f, 445f);
                     
                     BodyDef bdef = new BodyDef();
                     PolygonShape shape = new PolygonShape();
@@ -274,7 +279,28 @@ public class PlayScreen implements Screen
                     stage.addActor(new Necromancer(40000, skelDamage, 940f, 550f, stage));
                     stage.addActor(new Necromancer(40000, skelDamage, 940f, 340f, stage));
                     
+                    stage.addActor(topPath);
+                    stage.addActor(bottomPath);                   
+                    
                 }
+            }
+        });
+        
+        bottomPath.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                footPath = 2;
+            }
+        });
+        
+        topPath.addListener(new ChangeListener() 
+        {
+            @Override
+            public void changed (ChangeListener.ChangeEvent event, Actor actor) 
+            {
+                footPath = 1;
             }
         });
         
@@ -329,7 +355,12 @@ public class PlayScreen implements Screen
                 if(gold >= 50)
                 {
                     gold -= 50;
-                    stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 375, level, 1));
+                    if(level == 1)
+                        stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 375, level, footPath));
+                    if(level == 2 && footPath == 1)
+                        stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 465, level, footPath));
+                    if(level == 2 && footPath == 2)
+                        stage.addActor(new Footman(10000+footHealth, 1000+footDamage, 100, 435, level, footPath));
                 }
             }
         });        
@@ -339,10 +370,15 @@ public class PlayScreen implements Screen
             @Override
             public void changed (ChangeEvent event, Actor actor) 
             {
-                if(gold >= 10)
+                if(gold >= 20)
                 {
                     gold -= 20;
-                    stage.addActor(new Archer(archerHealth, archerDamage, 100f, 375f, 3f, stage));
+                    if(level == 1)
+                        stage.addActor(new Archer(archerHealth, archerDamage, 100f, 375f, 3f, stage, level, footPath));
+                    if(level == 2 && footPath == 1)
+                        stage.addActor(new Archer(archerHealth, archerDamage, 100f, 460f, 3f, stage, level, footPath));
+                    if(level == 2 && footPath == 2)
+                        stage.addActor(new Archer(archerHealth, archerDamage, 100f, 435f, 3f, stage, level, footPath));
                 }
             }
         });
@@ -583,7 +619,7 @@ public class PlayScreen implements Screen
             if(lose==false)
             {   
                 if(level == 1)
-                    stage.addActor(new Footman(footHealth, footDamage, 100f, 375f, level, footPath));
+                    stage.addActor(new Footman(footHealth, footDamage, 100f, 375f, level, 1));
                 if(level == 2)
                 {
                     stage.addActor(new Footman(footHealth, footDamage, 100f, 460f, level, 1));
@@ -796,7 +832,9 @@ public class PlayScreen implements Screen
                             gold += 50;
                             stage.addActor(new Footman(((Footman) a).health, footDamage, ((Footman) a).getX(), ((Footman) a).getY(), level, ((Footman) a).path));
                             ((Footman) a).remove();
-                            win = true;
+                            necromancerCount--;
+                            if(necromancerCount == 0)
+                                win = true;
                         }
                     }
                     else if (("necromancer".equals(a.getName())) && ("footman".equals(b.getName())))
@@ -814,7 +852,9 @@ public class PlayScreen implements Screen
                             gold += 50;
                             stage.addActor(new Footman(((Footman) b).health, footDamage, ((Footman) b).getX(), ((Footman) b).getY(), level, ((Footman) b).path));
                             ((Footman) b).remove();
-                            win = true;
+                            necromancerCount--;
+                            if(necromancerCount == 0)
+                                win = true;
                         }
                         if(((Footman) b).health <= 0)
                         {
@@ -1132,7 +1172,7 @@ public class PlayScreen implements Screen
                 if("archer".equals(a.getName()) && ((Archer) a).notmoving && (archerMoveTimer <= 0))
                 {
                     System.out.println("Archer not moving, new archer spawned");
-                    stage.addActor(new Archer(((Archer) a).health, ((Archer) a).damage, ((Archer) a).getX(), ((Archer) a).getY(), ((Archer)a).arrowTimer, stage));
+                    stage.addActor(new Archer(((Archer) a).health, ((Archer) a).damage, ((Archer) a).getX(), ((Archer) a).getY(), ((Archer)a).arrowTimer, stage, ((Archer) a).level, ((Archer) a).path));
                     ((Archer) a).remove();
                     len = stageActors.size;
                     archerMoveTimer = 80;

@@ -32,7 +32,7 @@ public class PlayerCharacter extends Sprite
     public boolean dead;
     Sprite emptyHealthBar, fullHealthBar;
     
-    public PlayerCharacter(World world)
+    public PlayerCharacter(World world, float x, float y)
     {   
         //super(new Texture("footman3.png"));
         texture = new Texture("goodWiz.png");
@@ -45,7 +45,7 @@ public class PlayerCharacter extends Sprite
         
         
         BodyDef bdef = new BodyDef();
-        bdef.position.set(100, 400);
+        bdef.position.set(x, y);
         bdef.type = BodyDef.BodyType.DynamicBody;
         bdef.linearDamping = 2;
         b2body = world.createBody(bdef);
